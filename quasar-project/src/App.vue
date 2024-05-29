@@ -19,75 +19,31 @@
     </q-header>
 
     <q-page-container class="container">
-      <div class="q-mt-lg">
-        <q-markup-table class="bg-dark text-white">
-          <thead class="table-vendas-head">
-            <tr>
-              <th class="text-left">Número</th>
-              <th class="text-center">Cliente</th>
-              <th class="text-center">Material</th>
-              <th class="text-center">Metragem (m³)</th>
-              <th class="text-center">Valor (R$)</th>
-              <th class="text-center">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="text-left">
-                <q-checkbox size="xs" v-model="val" val="xs" label="0001" />
-              </td>
-              <td class="text-center">TOP TERRA</td>
-              <td class="text-center">Cascalho</td>
-              <td class="text-center">12</td>
-              <td class="text-center">216,00</td>
-              <td class="text-center text-positive text-bold">Pago</td>
-            </tr>
-            <tr>
-              <td class="text-left">
-                <q-checkbox size="xs" v-model="val" val="xs" label="0002" />
-              </td>
-              <td class="text-center">POLEMICA SERVIÇOS</td>
-              <td class="text-center">Terra</td>
-              <td class="text-center">12</td>
-              <td class="text-center">90,00</td>
-              <td class="text-center text-negative text-bold">Em aberto</td>
-            </tr>
-            <tr>
-              <td class="text-left">
-                <q-checkbox size="xs" v-model="val" val="xs" label="0003" />
-              </td>
-              <td class="text-center">PAIAGUÁS TERRAPLANAGEM</td>
-              <td class="text-center">Cascalho</td>
-              <td class="text-center">25</td>
-              <td class="text-center">450,00</td>
-              <td class="text-center text-negative text-bold">Em aberto</td>
+      <div class="row wrap justify-between q-mt-md">
+        <div>
+          <input type="search" class="q-mr-xl text-white input-pesquisar" placeholder="Pesquisar...">
+          <button class="btn-table">Filtro</button>
+        </div>
 
-            </tr>
-            <tr>
-              <td class="text-left">
-                <q-checkbox size="xs" v-model="val" val="xs" label="0004" />
-              </td>
-              <td class="text-center">GRAN12 TERRAPLANAGEM</td>
-              <td class="text-center">Terra</td>
-              <td class="text-center">12</td>
-              <td class="text-center">90,00</td>
-              <td class="text-center text-positive text-bold">Pago</td>
-
-            </tr>
-            <tr>
-              <td class="text-left">
-                <q-checkbox size="xs" v-model="val" val="xs" label="0005" />
-              </td>
-              <td class="text-center">GRAN12 TERRAPLANAGEM</td>
-              <td class="text-center">Terra</td>
-              <td class="text-center">12</td>
-              <td class="text-center">90,00</td>
-              <td class="text-center text-positive text-bold">Pago</td>
-
-            </tr>
-          </tbody>
-        </q-markup-table>
+        <button class="btn-table">Nova Venda</button>
       </div>
+
+      <q-table
+      :rows="rows"
+      :columns="columns"
+      row-key="name"
+      class="bg-dark text-white q-mt-lg"
+      header-class="table-vendas-head text-white"
+      >
+
+      <template v-slot:header-cell="props">
+        <q-th :props="props" style="border-bottom: 1px solid #FFA700">
+          {{ props.col.label }}
+        </q-th>
+      </template>
+
+
+      </q-table>
     </q-page-container>
 
     <q-footer elevated class="bg-dark text-white">
@@ -103,16 +59,75 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+  import { ref } from 'vue'
 
+  const  columns = [
+        { name: 'numero', format: val => `${val}`, required: true, label: 'Número', align: 'left', field: 'numero'},
+        { name: 'client', required: true, label: 'Cliente', align: 'left', field: 'client' },
+        { name: 'material', required: true, label: 'Material', align: 'left', field: 'material' },
+        { name: 'metragem', required: true, label: 'Metragem', align: 'left', field: 'metragem' },
+        { name: 'valor', required: true, label: 'Valor', align: 'left', field: 'valor' },
+        { name: 'status', required: true, label: 'Status', align: 'left', field: 'status' },
+      ]
+  const  rows = [
+        {
+          numero: '0001',
+          client: 'TOP TERRA',
+          material: 'Cascalho',
+          metragem: '12m³',
+          valor: 'R$ 216,00',
+          status: 'Em aberto'
+        },
+        {
+          numero: '0002',
+          client: 'PAIAGUÁS TERRAPLANAGEM',
+          material: 'Terra',
+          metragem: '12m³',
+          valor: 'R$ 90,00',
+          status: 'Em aberto'
+        },
+        {
+          numero: '0003',
+          client: 'GRAN12 SERVIÇOS DE TERRAPLANAGEM',
+          material: 'Terra',
+          metragem: '12m³',
+          valor: 'R$ 90,00',
+          status: 'Em aberto'
+        },
+        {
+          numero: '0004',
+          client: 'GRAN12 SERVIÇOS DE TERRAPLANAGEM',
+          material: 'Terra',
+          metragem: '12m³',
+          valor: 'R$ 90,00',
+          status: 'Em aberto'
+        },
+        {
+          numero: '0005',
+          client: 'VIA LOG TRANSPORTES',
+          material: 'Cascalho',
+          metragem: '25m³',
+          valor: 'R$ 450,00',
+          status: 'Pago'
+        },
+        {
+          numero: '0006',
+          client: 'LUCIO PAGLIOTE',
+          material: 'Terra',
+          metragem: '12m³',
+          valor: 'R$ 90,00',
+          status: 'Pago'
+        },
+
+      ]
 export default {
   setup () {
     return {
-      val: ref(true)
+      columns,
+      rows
     }
   }
 }
-
 
 </script>
 
@@ -152,9 +167,49 @@ export default {
   }
 
   // TABELA DE VENDAS
-  .table-vendas-head tr th {
+  .input-pesquisar {
+    width: 300px;
+    padding: 10px;
+    background-color: transparent;
+
+    // ICONE de Pesquisar
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffffff"><path d="M10 2a8 8 0 0 0-6.32 13.26l-4.28 4.29 1.42 1.41 4.28-4.28A8 8 0 1 0 10 2zm0 2a6 6 0 1 1 0 12A6 6 0 0 1 10 4z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 20px 20px;
+
+    border: 1px solid #FFA700;
+    border-radius: 10px;
+    color: #ffffff;
+
+    ::-webkit-input-placeholder {
+      color: #ffffff;
+    }
+
+    .icon-pesquisar {
+      color: #ffffff;
+    }
+
+  }
+
+  .btn-table {
+    width: 150px;
+    background-color: transparent;
+    padding: 10px;
+    border: 1px solid #FFA700;
+    border-radius: 10px;
+    color: #ffffff;
+
+    &:hover {
+      color: #FFA700;
+      cursor: pointer;
+    }
+  }
+
+  .table-vendas-head {
     font-weight: bold;
     border-bottom: 1px solid #FFA700;
+    background-color: #FFA700;
   }
 
 
