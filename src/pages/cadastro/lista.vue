@@ -8,7 +8,7 @@
         placeholder="Pesquisar"
         outlined
         color="white"
-        class="btn-junin"
+        class="input-pesquisar"
         input-class="text-white"
       >
         <template v-slot:append>
@@ -284,31 +284,6 @@ export default {
 }
 .nav-list li a:hover {
   color: #ffa700;
-}
-
-// TABELA DE VENDAS
-.input-pesquisar {
-  width: 300px;
-  padding: 10px;
-  background-color: transparent;
-
-  // ICONE de Pesquisar
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffffff"><path d="M10 2a8 8 0 0 0-6.32 13.26l-4.28 4.29 1.42 1.41 4.28-4.28A8 8 0 1 0 10 2zm0 2a6 6 0 1 1 0 12A6 6 0 0 1 10 4z"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 20px 20px;
-
-  border: 1px solid #ffa700;
-  border-radius: 10px;
-  color: #ffffff;
-
-  ::-webkit-input-placeholder {
-    color: #ffffff;
-  }
-
-  .icon-pesquisar {
-    color: #ffffff;
-  }
 }
 
 .btn-table {
