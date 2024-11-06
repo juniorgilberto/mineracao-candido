@@ -1,36 +1,40 @@
 {
-  "name": "mineracao-candido",
-  "version": "0.0.1",
-  "description": "",
-  "productName": "Mineração Candido",
-  "author": "Gilberto Junior <56450453+juniorgilberto@users.noreply.github.com>",
-  "private": true,
+  "name": "app-base",
+  "version": "1.0.0",
+  "main": "expo/AppEntry.js",
   "scripts": {
-    "lint": "eslint --ext .js,.vue ./",
-    "format": "prettier --write \"**/*.{js,vue,scss,html,md,json}\" --ignore-path .gitignore",
-    "test": "echo \"No test specified\" && exit 0",
-    "dev": "quasar dev",
-    "build": "quasar build"
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
   },
   "dependencies": {
-    "@quasar/extras": "^1.16.4",
-    "quasar": "^2.16.0",
-    "vue": "^3.4.18",
-    "vue-router": "^4.0.12"
+    "@expo/metro-runtime": "~3.2.3",
+    "@expo/vector-icons": "^14.0.4",
+    "@react-native-async-storage/async-storage": "^2.0.0",
+    "@react-navigation/bottom-tabs": "^6.6.1",
+    "@react-navigation/drawer": "^6.7.2",
+    "@react-navigation/native": "^6.1.18",
+    "@react-navigation/stack": "^6.4.1",
+    "@rneui/themed": "^4.0.0-rc.8",
+    "@unform/mobile": "^2.1.6",
+    "axios": "^1.7.7",
+    "expo": "~51.0.36",
+    "expo-device": "^6.0.2",
+    "expo-location": "^17.0.1",
+    "expo-status-bar": "~1.12.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-native": "0.74.5",
+    "react-native-elements": "^3.4.3",
+    "react-native-gesture-handler": " ~2.16.1",
+    "react-native-paper": "^5.12.5",
+    "react-native-web": "~0.19.10",
+    "react-navigation": "^5.0.0",
+    "styled-components": "^6.1.13"
   },
   "devDependencies": {
-    "eslint": "^8.57.0",
-    "eslint-plugin-vue": "^9.0.0",
-    "vite-plugin-checker": "^0.6.4",
-    "eslint-config-prettier": "^8.1.0",
-    "prettier": "^2.5.1",
-    "@quasar/app-vite": "^1.9.0",
-    "autoprefixer": "^10.4.2",
-    "postcss": "^8.4.14"
+    "@babel/core": "^7.20.0"
   },
-  "engines": {
-    "node": "^20 || ^18 || ^16",
-    "npm": ">= 6.13.4",
-    "yarn": ">= 1.21.1"
-  }
+  "private": true
 }
