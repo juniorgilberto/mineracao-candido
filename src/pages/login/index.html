@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tela de Login</title>
+    <title>Login • Mineração Candido</title>
     <!-- Link do CSS do Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/assets/icon-principal-preto.svg">
 </head>
 <body>
     <div class="login-container">
@@ -27,42 +28,6 @@
         </form>
     </div>
 
-    <script>
-        document.getElementById("loginForm").addEventListener("submit", async function (event) {
-            event.preventDefault();
-
-            const userID = document.getElementById("userID").value;
-            const userPassword = document.getElementById("userPassword").value;
-
-            try {
-                const response = await fetch("https://mineracao-candido-api.vercel.app/login", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        email: userID,
-                        senha: userPassword,
-                    }),
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const token = data.token;
-
-                    // Armazenar o token no localStorage
-                    localStorage.setItem("authToken", token);
-
-                    // Redireciona para a Página HOME
-                    window.location.href = "../home/index.html";
-                } else {
-                    alert("ID ou senha inválidos!");
-                }
-            } catch (error) {
-                console.error("Erro ao conectar à API:", error);
-                alert("Ocorreu um erro. Tente novamente mais tarde.");
-            }
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
