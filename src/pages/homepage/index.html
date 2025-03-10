@@ -17,18 +17,18 @@
     <nav class="navbar navbar-container mb-4">
         <div class="container mx-auto" style="width: 80%;">
           <a class="navbar-brand" href="index.html">
-            <img src="../../../assets/icon-principal-preto.svg" width="45">
+            <img src="../../../assets/icon-principal-preto.svg" width="70">
           </a>
           <ul class="nav justify-content-end">
-            <li class="nav-item"><a class="nav-link text-black" aria-current="page" href="#">Home</a></li>
-            <li class="nav-item"><a class="nav-link text-black" href="#">Cadastro</a></li>
-            <li class="nav-item"><a class="nav-link text-black" href="#">Relatórios</a></li>
+            <li class="nav-item"><a class="nav-link" aria-current="page" href="#">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="../cadastro/index.html">Cadastro</a></li>
+            <li class="nav-item"><a class="nav-link" href="../relatorios/index.html">Relatórios</a></li>
           </ul>
         </div>
       </nav>
 
       <section>
-        <div class="d-flex justify-content-between align-items-center mx-auto" style="width: 80%;">
+        <div class="d-flex justify-content-between align-items-center mx-auto" style="width: 60%;">
             <span id="data"></span>
             <button class="btn btn-venda" data-bs-toggle="modal" data-bs-target="#modalVenda">Nova Venda</button>
         </div>
@@ -36,39 +36,45 @@
 
       <div class="modal fade" id="modalVenda" tabindex="-1" aria-labelledby="modalVendaLabel" aria-hidden="true">
         <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="modalVendaLabel">Nova Venda</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="modal-content p-4">
+            <h4 class="text-center mb-4">Nova Venda</h4>
+        
+            <div class="mb-3">
+                <label class="form-label">Cliente</label>
+                <select class="form-control border-0 border-bottom">
+                    <option selected disabled>Selecione um cliente</option>
+                    <!-- Opções do banco -->
+                </select>
             </div>
-            <div class="modal-body">
-                <form id="vendaForm">
-                    <div class="form-floating mb-2 text-start">
-                        <select class="form-control border-0 border-bottom" id="cliente">
-                            <option value="" disabled selected>Selecione um cliente</option>
-                            <option value="1">Cliente 1</option>
-                            <option value="2">Cliente 2</option>
-                        </select>
-                    </div>
-                    <div class="form-floating mb-4 text-start">
-                        <input type="text" class="form-control" id="veiculo" required>
-                        <label for="veiculo">Veículo</label>
-                    </div>
-                    <div class="form-floating mb-4 text-start">
-                        <input type="text" class="form-control" id="material" required>
-                        <label for="material">Material</label>
-                    </div>
-                    <div class="form-floating mb-4 text-start">
-                        <input type="number" class="form-control" id="metragem" required>
-                        <label for="metragem">Metragem</label>
-                    </div>
-                </form>
+        
+            <div class="mb-3">
+                <label class="form-label">Veículo</label>
+                <select class="form-control border-0 border-bottom">
+                    <option selected disabled>Selecione um veículo</option>
+                    <!-- Opções do banco -->
+                </select>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-              <button type="button" class="btn btn-venda" style="width: auto;">Lançar</button>
+        
+            <div class="mb-3">
+                <label class="form-label">Material</label>
+                <select class="form-control border-0 border-bottom">
+                    <option selected disabled>Selecione o material</option>
+                    <!-- Opções do banco -->
+                </select>
             </div>
-          </div>
+        
+            <div class="mb-4">
+                <label class="form-label">Metragem</label>
+                <input type="number" inputmode="numeric" class="form-control border-0 border-bottom" 
+                       placeholder="Digite a metragem">
+            </div>
+        
+            <!-- Botões -->
+            <div class="d-flex justify-content-end mt-3">
+                <button class="btn me-3 px-4 btn-venda" style="width: auto;">Lançar</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+          </div>       
         </div>
       </div>
       

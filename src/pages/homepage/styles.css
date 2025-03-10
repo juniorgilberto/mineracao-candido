@@ -7,8 +7,11 @@ body {
     background-color: #ffffff;
     box-shadow: 0 1px 7px rgba(0, 0, 0, 0.5);
 }
-.nav li {
-    font-size: 0.7rem;
+.nav li a{
+    color: #000000;
+}
+.nav li a:hover {
+    color: #ff6900;
 }
 .btn-venda {
     width: 200px;
@@ -31,8 +34,27 @@ body {
     box-shadow: none;
     border-color: #000000;
 }
-select.form-floating {
-    appearance: none;
-    background-color: transparent;
-    padding-left: 0;
+select.form-control, 
+input.form-control {
+    font-size: 16px;
+    padding: 10px 15px;
+    text-align: center;
+    background: transparent;
+    border-radius: 5px;
+}
+
+select::placeholder,
+input::placeholder {
+    color: #757575;
+}
+/* Remove as setinhas nos navegadores mais comuns */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield; /* Para Firefox */
+  appearance: none;           /* Para navegadores modernos */
 }

@@ -42,3 +42,82 @@ body {
 .btn:hover {
     background-color: #e55f00;
 }
+#loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8); /* Fundo escuro semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: none; /* Começa invisível */
+    z-index: 1000; /* Fica acima de tudo */
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 15px;
+}
+#errorModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* Fundo escuro */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    display: none; /* Começa invisível */
+    z-index: 1000;
+}
+
+.error-box {
+    background: #e8e8e8; /* Cor laranja da sua identidade */
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    min-width: 300px;
+}
+
+.error-box button {
+    background: #ff6900;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.error-box button:hover {
+    background: #e55f00;
+}
+
+@media (max-width: 768px) {
+    body {
+        background-color: #ffffff;
+    }
+
+    .login-container {
+        background: none;
+        border: none;
+        box-shadow: none;
+        width: 100%;
+        padding: 20px;
+    }
+
+    .login-container img {
+        max-width: 200px;
+    }
+}

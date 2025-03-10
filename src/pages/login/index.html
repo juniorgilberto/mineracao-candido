@@ -20,13 +20,28 @@
                 <input type="text" class="form-control" id="userID" required>
                 <label for="userID">Usuário</label>
             </div>
-            <div class="form-floating mb-4 text-start">
+            <div class="form-floating mb-5 text-start">
                 <input type="password" class="form-control" id="userPassword" required>
                 <label for="userPassword">Senha</label>
             </div>
-            <button type="submit" class="btn w-100">Login</button>
+            <button type="submit" class="btn w-100" id="loginButton">Login</button>
         </form>
     </div>
+
+    <!-- Overlay de Carregamento -->
+    <div id="loadingOverlay">
+        <div class="spinner-border text-light" role="status"></div>
+        <p>Carregando...</p>
+    </div>
+    <!-- Modal de Erro -->
+    <div id="errorModal">
+        <div class="error-box">
+            <p id="errorMessage">Usuário ou senha inválidos!</p>
+            <button onclick="closeErrorModal()">OK</button>
+        </div>
+    </div>
+
+
 
     <script src="script.js"></script>
 </body>

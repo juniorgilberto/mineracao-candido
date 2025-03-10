@@ -1,0 +1,15 @@
+body {
+    height: 100vh;
+    background-color: #e8e8e8;
+    font-family: 'Montserrat';
+}
+.navbar-container{
+    background-color: #ffffff;
+    box-shadow: 0 1px 7px rgba(0, 0, 0, 0.5);
+}
+.nav li a{
+    color: #000000;
+}
+.nav li a:hover {
+    color: #ff6900;
+}
