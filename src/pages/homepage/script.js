@@ -6,10 +6,30 @@ if (!token) {
     window.location.href = "../login/index.html";
 }
 
-const hoje = new Date();
-const opcoes = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-let dataFormatada = hoje.toLocaleDateString('pt-BR', opcoes);
-dataFormatada = dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
+function setDefaultDate(inputId) {
+    let now = new Date(); 
+    
+    let year = now.getFullYear();
+    let month = String(now.getMonth() + 1).padStart(2, '0');
+    let day = String(now.getDate()).padStart(2, '0');
 
-document.getElementById("data").textContent = dataFormatada;
+    let today = `${year}-${month}-${day}`;
+    document.getElementById(inputId).value = today;
+}
+function toggleMenu() {
+    let menu = document.getElementById("menu");
+    if (menu.style.display === "flex") {
+        menu.style.display = "none";
+    } else {
+        menu.style.display = "flex";
+    }
+}
+function dateModal() {
+    setDefaultDate("modalDatePicker");
+}
+
+window.onload = function() {
+    setDefaultDate("datePicker");    
+};
+
 

@@ -48,7 +48,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8); /* Fundo escuro semi-transparente */
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -56,8 +56,8 @@ body {
     color: white;
     font-size: 1.5rem;
     font-weight: bold;
-    display: none; /* Começa invisível */
-    z-index: 1000; /* Fica acima de tudo */
+    display: none;
+    z-index: 1000;
 }
 
 .spinner-border {
@@ -71,16 +71,16 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7); /* Fundo escuro */
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
-    display: none; /* Começa invisível */
+    display: none;
     z-index: 1000;
 }
 
 .error-box {
-    background: #e8e8e8; /* Cor laranja da sua identidade */
+    background: #e8e8e8;
     padding: 20px;
     border-radius: 10px;
     text-align: center;
