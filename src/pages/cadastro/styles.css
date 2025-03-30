@@ -1,0 +1,45 @@
+.container-clientes {
+    width: 60%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+}
+.btn-cadastro {
+    width: 200px;
+    background-color: #5ba642;
+    color: #ffffff;
+    white-space: nowrap;
+}
+.btn-cadastro:hover {
+    background-color: #3f8927;
+    color: #ffffff;
+}
+.form-control {
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid #000000;
+    background-color: #ffffff;
+    color: #000000;
+}
+.form-control:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: #000000;
+}
+@media (max-width: 768px) {
+    .container-clientes {
+        width: 80%;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+    .btn-cadastro{
+        width: 100%;
+        margin: 8px auto;
+    }
+    .botao-modal .btn-cadastro {
+        width: 100%;
+        margin: 0;
+    }
+}

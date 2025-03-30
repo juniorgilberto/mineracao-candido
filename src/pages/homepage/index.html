@@ -31,15 +31,17 @@
       </nav>
 
       <section>
-        <div class="d-flex justify-content-between align-items-center mx-auto" style="width: 60%;">
-          <div>
+        <div class="container-venda d-flex justify-content-between align-items-center">
+          <div class="input-container">
             <label class="me-2" for="datePicker">Data atual:</label>
             <input class="text-center" type="date" id="datePicker">
           </div>
             <button class="btn btn-venda" data-bs-toggle="modal" data-bs-target="#modalVenda" onclick="dateModal()">Nova Venda</button>
         </div>
       </section>
+      
 
+      <!-- MODEL VENDA -->
       <div class="modal fade" id="modalVenda" tabindex="-1" aria-labelledby="modalVendaLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content p-4">
@@ -80,12 +82,13 @@
           </div>
         
             <!-- Botões -->
-            <div class="d-flex justify-content-end mt-3">
-                <button class="btn me-3 px-4 btn-venda" style="width: auto;">Lançar</button>
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            <div class="botao-modal d-flex justify-content-end mt-3">
+              <button type="submit" class="btn btn-venda me-3 px-4">Lançar</button>
+              <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
             </div>
           </div>       
         </div>
       </div>
+      <!-- FIM MODAL VENDA -->
 </body>
 </html>

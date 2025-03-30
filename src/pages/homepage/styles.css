@@ -2,6 +2,7 @@
     width: 200px;
     background-color: #5ba642;
     color: #ffffff;
+    white-space: nowrap;
 }
 .btn-venda:hover {
     background-color: #3f8927;
@@ -18,6 +19,33 @@
     outline: none;
     box-shadow: none;
     border-color: #000000;
+}
+
+.container-venda {
+    width: 60%;
+    margin: 0 auto;
+}
+  
+.input-container {
+    display: flex;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .container-venda {
+      flex-direction: column;
+      width: 100%;
+      max-width: 400px;
+    }
+  
+    .btn-venda {
+      width: 80%;
+      margin: 8px auto;
+    }
+    .botao-modal .btn-venda {
+        width: 100%;
+        margin: 0;
+    }
 }
 
 select.form-control, 
