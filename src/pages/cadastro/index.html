@@ -14,6 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet"/>
   <link rel="icon" type="image/png" href="/assets/icon-principal-preto.svg" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-container mb-4">
@@ -40,21 +41,12 @@
         </ul>
       </div>
     </nav>
-
-    <div class="container-clientes">
-      <button type="button" class="btn btn-cadastro" data-bs-toggle="modal" data-bs-target="#clienteModal">
-          Cadastrar Cliente
-      </button>
-      <button type="button" class="btn btn-cadastro" data-bs-toggle="modal" data-bs-target="#modalMaterial">
-        Cadastrar Material
-    </button>
-  </div>
   
   <div class="modal fade" id="clienteModal" tabindex="-1" aria-labelledby="clienteModalLabel" aria-hidden="true">
       <div class="modal-dialog">
           <div class="modal-content p-4">
               <h4 class="text-center mb-4">Cadastro de Cliente</h4>
-              <form>
+              <form id="form-clientes">
                   <div class="mb-3">
                       <label for="nome" class="form-label">Nome</label>
                       <input type="text" class="form-control" id="nome" required>
@@ -73,20 +65,51 @@
                   </div>
                   <div class="mb-3">
                       <label for="email" class="form-label">E-mail</label>
-                      <input type="email" class="form-control" id="email" required>
+                      <input type="email" class="form-control" id="email">
                   </div>
                   <div class="mb-3">
                       <label for="endereco" class="form-label">Endereço</label>
-                      <input type="text" class="form-control" id="endereco" required>
+                      <input type="text" class="form-control" id="endereco">
                   </div>
                   <div class="botao-modal d-flex justify-content-end mt-4">
-                      <button type="submit" class="btn btn-cadastro me-3 px-4">Salvar</button>
-                      <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                      <button type="submit" class="btn btn-cadastro me-3 px-4">Cadastrar</button>
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                   </div>
               </form>
           </div>
       </div>
   </div>
+
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Clientes Cadastrados</h2>
+      <div class="filtro-container mb-4">
+        <button type="button" class="btn btn-cadastro" data-bs-toggle="modal" data-bs-target="#clienteModal">
+          Cadastrar Cliente
+        </button>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i>
+            <input type="text" id="filtro" class="form-control text-center" placeholder="Filtrar clientes...">
+          </span>
+        </div>
+      </div>
+       
+    <table class="table table-bordered" id="tabela-clientes">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>CPF/CNPJ</th>
+                <th>Inscrição Estadual</th>
+                <th>Telefone</th>
+                <th>E-mail</th>
+                <th>Endereço</th>
+                <th>Veículos</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div id="cards-clientes"></div>
+</div>
 
 </body>
 </html>
