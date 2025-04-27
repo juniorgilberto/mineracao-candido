@@ -28,7 +28,7 @@
 }
 th, td {
     padding: 12px 15px;
-    text-align: left;
+    text-align: center;
     vertical-align: middle;
     border: none;
     border-radius: 0;
@@ -80,7 +80,7 @@ tr:hover {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     #tabela-clientes { display: none; }
     #cards-clientes { display: block; }
 
@@ -112,6 +112,6 @@ tr:hover {
         width: 100%;
     }
 }
-@media (min-width: 769px) {
+@media (min-width: 993px) {
     #cards-clientes { display: none; }
 }
