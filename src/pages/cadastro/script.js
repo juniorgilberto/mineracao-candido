@@ -58,7 +58,7 @@ async function carregarClientes() {
                         <ul class="dropdown-menu">
                             ${veiculos}
                         </ul>
-                        <button class="btn btn-success btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#veiculoModal">
+                        <button class="btn btn-success btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#modalCadastrarVeiculo">
                             Adicionar
                         </button>
                     </div>
@@ -75,14 +75,16 @@ async function carregarClientes() {
 }
 
 //CASO MEU DISPOSITIVO SEJA MENOR, CONVERTE MINHA TABELA DE CLIENTES PARA CARDS
+
 function atualizarCards() {
     const tabelaBody = document.querySelector("#tabela-clientes tbody");
     const cardsContainer = document.querySelector("#cards-clientes");
-    
     cardsContainer.innerHTML = "";
     const linhas = tabelaBody.querySelectorAll("tr");
+
     linhas.forEach(tr => {
         if (tr.style.display === "none") return;
+
         const colunas = tr.querySelectorAll("td");
         const nome = colunas[0].innerText;
         const cpfCnpj = colunas[1].innerText;
@@ -90,21 +92,41 @@ function atualizarCards() {
         const telefone = colunas[3].innerText;
         const email = colunas[4].innerText;
         const endereco = colunas[5].innerText;
+        const veiculos = colunas[6] ? colunas[6].innerText.split(",") : [];
 
         const card = document.createElement("div");
         card.className = "card mb-3";
+
+        const veiculoOptions = veiculos.map(v => `<li><a class="dropdown-item">${v.trim()}</a></li>`).join('') || '<li><span class="dropdown-item disabled">Nenhum veículo</span></li>';
+
         card.innerHTML = `
             <div class="card-body">
                 <h5 class="card-title">${nome}</h5>
-                <p class="card-text"><strong>CPF/CNPJ:</strong> ${cpfCnpj}</p>
-                <p class="card-text"><strong>Inscrição Estadual:</strong> ${inscricao}</p>
-                <p class="card-text"><strong>Telefone:</strong> ${telefone}</p>
-                <p class="card-text"><strong>Email:</strong> ${email}</p>
-                <p class="card-text"><strong>Endereço:</strong> ${endereco}</p>
+                <p class="card-text"><strong>CPF/CNPJ:</strong> ${cpfCnpj || ""}</p>
+                <p class="card-text"><strong>Inscrição Estadual:</strong> ${inscricao || ""}</p>
+                <p class="card-text"><strong>Telefone:</strong> ${telefone || ""}</p>
+                <p class="card-text"><strong>Email:</strong> ${email || ""}</p>
+                <p class="card-text"><strong>Endereço:</strong> ${endereco || ""}</p>
+                
+                <div class="d-flex gap-2 mt-3">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            Veículos
+                        </button>
+                        <ul class="dropdown-menu">
+                            ${veiculoOptions}
+                        </ul>
+                    </div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCadastrarVeiculo">
+                        Adicionar Veículo
+                    </button>
+                </div>
             </div>
         `;
+
         cardsContainer.appendChild(card);
     });
+
 }
 
 
@@ -143,6 +165,17 @@ async function cadastrarVeiculo(clienteId, modelo, placa) {
         console.error('Erro ao cadastrar veículo:', error);
     }
 }
+
+function abrirModalCadastrarVeiculo(clienteId) {
+    const modal = new bootstrap.Modal(document.getElementById('modalCadastrarVeiculo'));
+    document.getElementById('clienteIdVeiculo').value = clienteId;
+    document.getElementById('form-cadastrar-veiculo').reset();
+    modal.show();
+}
+
+// Evento para o submit do form de veículo
+
+
 
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.querySelector("form");
@@ -195,6 +228,40 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         } catch (error) {
             console.error("Erro:", error);
+        }
+    });
+
+    document.getElementById('form-cadastrar-veiculo').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const clienteId = document.getElementById('clienteIdVeiculo').value;
+        const modelo = document.getElementById('modeloVeiculo').value;
+        const placa = document.getElementById('placaVeiculo').value;
+    
+        try {
+            const response = await fetch('https://mineracao-candido-api.vercel.app/veiculos', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    clienteId: clienteId,
+                    modelo: modelo,
+                    placa: placa
+                }),
+            });
+    
+            if (response.ok) {
+                const modalElement = bootstrap.Modal.getInstance(document.getElementById('modalCadastrarVeiculo'));
+                modalElement.hide();
+                alert("Veículo cadastrado com sucesso!");
+                carregarClientes(); // Atualiza a tabela e os cards
+            } else {
+                alert("Erro ao cadastrar veículo!");
+            }
+        } catch (error) {
+            console.error('Erro ao cadastrar veículo:', error);
         }
     });
 

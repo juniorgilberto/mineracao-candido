@@ -111,26 +111,33 @@
     <div id="cards-clientes"></div>
 
 
-    <div class="modal fade" id="veiculoModal" tabindex="-1" aria-labelledby="veiculoModal" aria-hidden="true">
+    <!-- Modal Cadastrar Veículo -->
+    <div class="modal fade" id="modalCadastrarVeiculo" tabindex="-1" aria-labelledby="modalCadastrarVeiculoLabel" aria-hidden="true">
       <div class="modal-dialog">
-          <div class="modal-content p-4">
-              <h4 class="text-center mb-4">Cadastro de Veiculo</h4>
-              <form id="form-clientes">
-                  <div class="mb-3">
-                      <label for="marca" class="form-label">Marca</label>
-                      <input type="text" class="form-control" id="marca" required>
-                  </div>
-                  <div class="mb-3">
-                      <label for="modelo" class="form-label">Modelo</label>
-                      <input type="text" class="form-control" id="modelo" required>
-                  </div>
-                  <div class="botao-modal d-flex justify-content-end mt-4">
-                      <button type="submit" class="btn btn-cadastro me-3 px-4">Cadastrar</button>
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                  </div>
-              </form>
+        <form id="form-cadastrar-veiculo" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalCadastrarVeiculoLabel">Cadastrar Veículo</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
           </div>
+          <div class="modal-body">
+            <input type="hidden" id="clienteIdVeiculo">
+
+            <div class="mb-3">
+              <label for="modeloVeiculo" class="form-label">Modelo</label>
+              <input type="text" class="form-control" id="modeloVeiculo" required>
+            </div>
+            <div class="mb-3">
+              <label for="placaVeiculo" class="form-label">Placa</label>
+              <input type="text" class="form-control" id="placaVeiculo" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-cadastro">Cadastrar</button>
+          </div>
+        </form>
       </div>
+    </div>
+
 </div>
 
 </body>
