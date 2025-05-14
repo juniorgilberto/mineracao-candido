@@ -14,6 +14,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="/assets/icon-principal-preto.svg">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+
 </head>
 <body>
     <nav class="navbar navbar-container mb-4">
@@ -49,7 +51,7 @@
         
             <div class="mb-3">
                 <label class="form-label">Cliente</label>
-                <select class="form-control border-0 border-bottom">
+                <select id="selectCliente" class="form-control border-0 border-bottom">
                     <option selected disabled>Selecione um cliente</option>
                     <!-- Opções do banco -->
                 </select>
@@ -57,15 +59,13 @@
         
             <div class="mb-3">
                 <label class="form-label">Veículo</label>
-                <select class="form-control border-0 border-bottom">
-                    <option selected disabled>Selecione um veículo</option>
-                    <!-- Opções do banco -->
-                </select>
+                <input id="inputVeiculo" type="text" class="form-control border-0 border-bottom" 
+                       placeholder="Digite a placa do veículo">
             </div>
         
             <div class="mb-3">
                 <label class="form-label">Material</label>
-                <select class="form-control border-0 border-bottom">
+                <select id="selectMaterial" class="form-control border-0 border-bottom">
                     <option selected disabled>Selecione o material</option>
                     <!-- Opções do banco -->
                 </select>
@@ -73,7 +73,7 @@
         
             <div class="mb-4">
                 <label class="form-label">Metragem</label>
-                <input type="number" inputmode="numeric" class="form-control border-0 border-bottom" 
+                <input id="inputMetragem" type="number" inputmode="numeric" class="form-control border-0 border-bottom" 
                        placeholder="Digite a metragem">
             </div>
             <div class="mb-4">
@@ -83,12 +83,16 @@
         
             <!-- Botões -->
             <div class="botao-modal d-flex justify-content-end mt-3">
-              <button type="submit" class="btn btn-venda me-3 px-4">Lançar</button>
+              <button id="btnLancarVenda" type="submit" class="btn btn-venda me-3 px-4">Lançar</button>
               <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
             </div>
           </div>       
         </div>
       </div>
       <!-- FIM MODAL VENDA -->
+
+      <div id="cardsContainer" class="row mt-4 g-3"></div>
+
+      <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 </body>
 </html>
