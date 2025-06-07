@@ -54,7 +54,6 @@
                 <label class="form-label">Cliente</label>
                 <select id="selectCliente" class="form-control border-0 border-bottom">
                     <option selected disabled>Selecione um cliente</option>
-                    <!-- Opções do banco -->
                 </select>
             </div>
         
@@ -68,7 +67,6 @@
                 <label class="form-label">Material</label>
                 <select id="selectMaterial" class="form-control border-0 border-bottom">
                     <option selected disabled>Selecione o material</option>
-                    <!-- Opções do banco -->
                 </select>
             </div>
         
@@ -82,7 +80,6 @@
               <input type="date" inputmode="numeric" class="form-control border-0 border-bottom" placeholder="Digite a metragem" id="modalDatePicker">
           </div>
         
-            <!-- Botões -->
             <div class="botao-modal d-flex justify-content-end mt-3">
               <button id="btnLancarVenda" type="submit" class="btn btn-venda me-3 px-4">Lançar</button>
               <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -92,8 +89,10 @@
       </div>
       <!-- FIM MODAL VENDA -->
 
+      <!-- ONDE SERÁ CARREGADO OS CARDS DE PEDIDOS -->
       <div id="cardsContainer" class="row mt-4 g-3 container-venda"></div>
 
+      <!-- Modal de CONFIRMAÇÃO DE PARA ADICIONAR OU DIMINUIR QUANTIDADE DE VIAGENS -->
       <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content rounded-4">
@@ -104,13 +103,44 @@
             <div class="modal-body">
               Tem certeza que deseja <span id="acaoTexto"></span> a quantidade de viagens?
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-venda" id="confirmarAcaoBtn">Confirmar</button>
+            <div class="modal-footer d-flex justify-content-center align-items-center">
+              <button type="button" class="btn btn-venda" style="width: auto;" id="confirmarAcaoBtn">Confirmar</button>
+              <button type="button" class="btn btn-secondary" style="width: auto;" data-bs-dismiss="modal">Cancelar</button>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Modal de EDIÇÃO DE PEDIDOS -->
+      <div class="modal fade" id="modalEditarPedido" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form id="formEditarPedido" onsubmit="salvarEdicaoPedido(event)">
+              <div class="modal-header">
+                <h5 class="modal-title">Editar Pedido</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <input type="hidden" id="editarId">
+                <div class="mb-3">
+                  <label>Placa</label>
+                  <input type="text" class="form-control border-0 border-bottom" id="editarVeiculo">
+                </div>
+                <div class="mb-3">
+                  <label>Metragem</label>
+                  <input type="number" class="form-control border-0 border-bottom" id="editarMetragem">
+                </div>
+              </div>
+              <div class="modal-footer d-flex justify-content-center align-items-center">
+                <button type="submit" class="btn btn-venda" style="width: auto;">Salvar</button>
+                <button type="button" class="btn btn-secondary" style="width: auto;" data-bs-dismiss="modal">Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de EXCLUSÃO DE PEDIDOS -->
       <div class="modal fade" id="modalConfirmDelete" tabindex="-1" aria-labelledby="modalConfirmDeleteLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content border-danger">

@@ -8,18 +8,6 @@
     background-color: #3f8927;
     color: #ffffff;
 }
-.form-control {
-    border: none;
-    border-radius: 0;
-    border-bottom: 1px solid #000000;
-    background-color: #ffffff;
-    color: #000000;
-}
-.form-control:focus {
-    outline: none;
-    box-shadow: none;
-    border-color: #000000;
-}
 
 .container-venda {
     width: 60%;

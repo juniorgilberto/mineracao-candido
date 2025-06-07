@@ -39,11 +39,26 @@ const carregarPedidos = async (data) => {
       card.className = "col-12 col-sm-6 col-lg-4 mb-4 d-flex";
       card.innerHTML = `
         <div class="card card-pedido shadow-sm p-3 border rounded-3 position-relative w-100">
-          <button class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2" onclick="excluirPedido(${id})">
-            <i class="bi bi-trash3"></i>
-          </button>
-          <div class="card-body">
-            <h5 class="card-title">${cliente.nome}</h5>
+          
+          <div class="card-body position-relative">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="card-title mb-0">${cliente.nome}</h5>
+              <div>
+                <button 
+                  class="btn btn-sm" 
+                  onclick="abrirEditarPedido(this)" 
+                  data-id="${id}"
+                  data-veiculo="${veiculo || ''}"
+                  data-metragem="${metragem}"
+                >
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                <button class="btn btn-sm" onclick="excluirPedido(${id})">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </div>
+            </div>
+            <p class="card-text"><strong>Nº Pedido:</strong> ${id}</p>
             <p class="card-text"><strong>Placa:</strong> ${veiculo || '-'}</p>
             <p class="card-text"><strong>Produto:</strong> ${produto.nome}</p>
             <p class="card-text"><strong>Metragem:</strong> ${metragem}</p>
@@ -65,6 +80,50 @@ const carregarPedidos = async (data) => {
     console.error("Erro ao carregar pedidos:", error);
   }
 };
+
+const abrirEditarPedido = (button) => {
+  const id = button.getAttribute("data-id");
+  const veiculo = button.getAttribute("data-veiculo");
+  const metragem = button.getAttribute("data-metragem");
+
+  document.getElementById("editarId").value = id;
+  document.getElementById("editarVeiculo").value = veiculo;
+  document.getElementById("editarMetragem").value = metragem;
+
+  const modal = new bootstrap.Modal(document.getElementById("modalEditarPedido"));
+  modal.show();
+};
+
+const salvarEdicaoPedido = async (event) => {
+  event.preventDefault();
+
+  const id = document.getElementById("editarId").value;
+  const veiculo = document.getElementById("editarVeiculo").value;
+  const metragem = parseFloat(document.getElementById("editarMetragem").value);
+
+  try {
+    const response = await fetch(`https://mineracao-candido-api.vercel.app/pedidos/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ veiculo, metragem}),
+    });
+
+    if (!response.ok) throw new Error("Erro ao salvar edição.");
+
+    // Fecha o modal e recarrega os pedidos
+    bootstrap.Modal.getInstance(document.getElementById("modalEditarPedido")).hide();
+    await carregarPedidos(getElement("datePicker").value); // Recarrega os cards
+
+  } catch (error) {
+    console.error("Erro ao editar pedido:", error);
+    alert("Falha ao editar pedido.");
+  }
+};
+
+
 
 // Excluir pedido
 let pedidoParaExcluir = null;
