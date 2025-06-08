@@ -38,22 +38,27 @@ const carregarPedidos = async (data) => {
       const card = document.createElement("div");
       card.className = "col-12 col-sm-6 col-lg-4 mb-4 d-flex";
       card.innerHTML = `
-        <div class="card card-pedido shadow-sm p-3 border rounded-3 position-relative w-100">
+        <div class="card card-pedido shadow-sm p-3 border rounded-3 w-100">
           
-          <div class="card-body position-relative">
-            <div class="d-flex justify-content-between align-items-center">
-              <h5 class="card-title mb-0">${cliente.nome}</h5>
-              <div>
+          <div class="card-body">
+            <div class="position-relative">
+              <h5 class="card-title mb-0 text-break pe-5">
+                ${cliente.nome}
+              </h5>
+              <div class="position-absolute top-0 end-0 d-flex gap-2">
                 <button 
-                  class="btn btn-sm" 
-                  onclick="abrirEditarPedido(this)" 
+                  class="btn btn-sm p-0 border-0 bg-transparent" 
+                  onclick="abrirEditarPedido(this)"
                   data-id="${id}"
                   data-veiculo="${veiculo || ''}"
                   data-metragem="${metragem}"
                 >
                   <i class="bi bi-pencil-square"></i>
                 </button>
-                <button class="btn btn-sm" onclick="excluirPedido(${id})">
+                <button 
+                  class="btn btn-sm p-0 border-0 bg-transparent" 
+                  onclick="excluirPedido(${id})"
+                >
                   <i class="bi bi-trash3"></i>
                 </button>
               </div>

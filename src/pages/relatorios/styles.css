@@ -1,0 +1,76 @@
+.filtros-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.dropdown-menu {
+  padding: 20px;
+  width: 300px;
+}
+.table th,
+.table td {
+  vertical-align: middle;
+}
+.btn-relatorio {
+  width: 200px;
+  background-color: #5ba642;
+  color: #ffffff;
+  white-space: nowrap;
+}
+.btn-relatorio:hover {
+  background-color: #3f8927;
+  color: #ffffff;
+}
+.input-group {
+  max-width: 700px;
+
+  & input {
+    width: 100%;
+    border: none;
+  }
+  & span {
+    background-color: #ffffff;
+    width: 50%;
+    border: none;
+    border-bottom: 1px solid #000000;
+    border-radius: 0;
+  }
+}
+.filtros-container .form-group {
+  min-width: 200px;
+  flex-grow: 1;
+}
+
+.btn-relatorio {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+}
+
+.btn-relatorio:hover {
+  background-color: #45a049;
+}
+select.form-control {
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid #000 !important;
+  box-shadow: none;
+  text-align: center;
+}
+select.form-control:focus {
+  border-color: #000;
+  outline: none;
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .filtros-container .form-group {
+    min-width: 100%;
+  }
+  .btn-relatorio {
+    width: 100%;
+  }
+  .botao-filtro {
+    width: 100%;
+  }
+}
