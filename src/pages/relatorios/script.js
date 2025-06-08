@@ -1,6 +1,15 @@
 const token = localStorage.getItem("authToken");
 if (!token) window.location.href = "../login/index.html";
 
+function toggleMenu() {
+  let menu = document.getElementById("menu");
+  if (menu.style.display === "flex") {
+    menu.style.display = "none";
+  } else {
+    menu.style.display = "flex";
+  }
+}
+
 window.onload = buscarPedidos;
 
 function buscarPedidos() {
