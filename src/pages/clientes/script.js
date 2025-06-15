@@ -47,10 +47,7 @@ async function carregarClientes() {
       tr.innerHTML = `
                 <td class="text-truncate" style="max-width: 200px;" title="${nome}">${nome}</td>
                 <td>${cpfCnpj}</td>
-                <td>${inscricaoEstadual}</td>
                 <td>${telefone}</td>
-                <td class="text-lowercase">${email}</td>
-                <td class="text-truncate" style="max-width: 250px;" title="${endereco}">${endereco}</td>
                 <td class="text-center">
                     <button class="btn btn-sm d-flex justify-content-center align-items-center mx-auto" style="width: 36px; height: 36px;" onclick="editarCliente(${id}); event.stopPropagation();">
                         <i class="bi bi-pencil-square text-dark"></i>
