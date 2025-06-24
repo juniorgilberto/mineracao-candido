@@ -38,10 +38,7 @@ async function carregarClientes() {
 
       const nome = cliente.nome || "";
       const cpfCnpj = cliente.cpfCnpj || "";
-      const inscricaoEstadual = cliente.ie || "";
       const telefone = cliente.telefone || "";
-      const email = cliente.email || "";
-      const endereco = cliente.endereco || "";
       const id = cliente.id;
 
       tr.innerHTML = `
@@ -100,10 +97,7 @@ function atualizarCards() {
     const colunas = tr.querySelectorAll("td");
     const nome = colunas[0].innerText;
     const cpfCnpj = colunas[1].innerText;
-    const inscricao = colunas[2].innerText;
     const telefone = colunas[3].innerText;
-    const email = colunas[4].innerText;
-    const endereco = colunas[5].innerText;
     const id = tr
       .querySelector("button")
       ?.getAttribute("onclick")
@@ -121,10 +115,7 @@ function atualizarCards() {
                     </button>
                 </div>
                 <p class="card-text"><strong>CPF/CNPJ:</strong> ${cpfCnpj}</p>
-                <p class="card-text"><strong>Inscrição Estadual:</strong> ${inscricao}</p>
                 <p class="card-text"><strong>Telefone:</strong> ${telefone}</p>
-                <p class="card-text"><strong>Email:</strong> ${email}</p>
-                <p class="card-text"><strong>Endereço:</strong> ${endereco}</p>
             </div>
         `;
 
