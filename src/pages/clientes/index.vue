@@ -27,6 +27,7 @@
       :rows="filtered"
       :columns="columns"
       row-key="id"
+      class="text-center"
       dense
       flat
       separator="horizontal"
@@ -75,9 +76,9 @@ const clients = ref([])
 const filter = ref('')
 
 const columns = [
-  { name: 'name', label: 'Nome', field: row => row.name, sortable: true },
+  { name: 'nome', label: 'Nome', field: row => row.nome, sortable: true },
   { name: 'email', label: 'E‑mail', field: 'email', sortable: true },
-  { name: 'phone', label: 'Telefone', field: 'phone' },
+  { name: 'telefone', label: 'Telefone', field: 'telefone' },
   { name: 'actions', label: 'Ações', field: 'actions', align: 'center' }
 ]
 
@@ -85,7 +86,7 @@ const filtered = computed(() => {
   const q = filter.value && filter.value.toLowerCase().trim()
   if (!q) return clients.value
   return clients.value.filter(c =>
-    (c.name + ' ' + c.email + ' ' + c.phone).toLowerCase().includes(q)
+    (c.name + ' ' + c.email + ' ' + c.telefone).toLowerCase().includes(q)
   )
 })
 
@@ -115,17 +116,15 @@ function deleteClient() {
   toDelete.value = null
 }
 
-const carregaLista = (()=>{
+const carregaLista = (async ()=>{
 
-  api.get('/clients').then((response)=>{
-
-    clients.value = response.data;
-
-  }).catch((error)=>{
-
-    console.log('Erro ao carregar lista de clientes: ', error);
-
-  });
+  try {
+    const response =  await api.get('/clients')
+    clients.value = response.data
+  } catch (error) {
+    console.error('Erro ao carregar clientes:', error)
+    $q.notify({ type: 'negative', message: 'Erro ao carregar clientes' })
+  }
 
 })
 

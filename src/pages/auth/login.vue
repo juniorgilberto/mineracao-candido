@@ -1,51 +1,45 @@
 <template>
   <q-page class="row items-center justify-center bg-grey-1">
     <q-card class="q-pa-md" style="max-width: 420px; width: 95%">
-      <q-toolbar class="q-pl-none q-pr-none">
-        <q-toolbar-title>
-          Entrar
-          <div class="text-subtitle2">Acesse sua conta</div>
-        </q-toolbar-title>
+      <q-toolbar class="q-pa-none">
+        <div class="row items-center justify-center" style="width: 100%;">
+          <q-icon name="img:public/logo-preta.svg" style="width: 250px; height: auto;" />
+        </div>
       </q-toolbar>
 
-      <q-separator />
 
-      <q-form @submit.prevent="onSubmit" class="q-gutter-md" ref="formRef">
+      <q-form @submit.prevent="onSubmit" class="q-gutter-y-md" ref="formRef">
         <q-input
-          v-model="form.email"
-          label="E-mail"
-          type="email"
-          :rules="[val => !!val || 'E-mail é obrigatório', val => /.+@.+\..+/.test(val) || 'E-mail inválido']"
+          v-model="form.usuario"
+          label="Usuário"
+          type="text"
+          :rules="[val => !!val || 'Usuário é obrigatório' || 'Usuário inválido']"
           dense
           autofocus
         />
 
         <q-input
-          v-model="form.password"
-          :type="showPassword ? 'text' : 'password'"
+          v-model="form.senha"
+          :type="showPassword ? 'text' : 'Senha'"
           label="Senha"
-          :rules="[val => !!val || 'Senha é obrigatória', val => (val && val.length >= 6) || 'Mínimo 6 caracteres']"
+          :rules="[val => !!val || 'Senha é obrigatória', val => (val && val.length >= 3) || 'Mínimo 3 caracteres']"
           dense
         >
-          <template #after>
-            <q-btn flat round dense icon="visibility" v-if="!showPassword" @click="showPassword = true" />
-            <q-btn flat round dense icon="visibility_off" v-else @click="showPassword = false" />
+          <template #append>
+            <q-btn flat round dense :icon="showPassword ? 'visibility_off' : 'visibility'" @click="showPassword = !showPassword" />
           </template>
         </q-input>
 
-        <div class="row items-center q-gutter-sm">
-          <q-checkbox v-model="form.remember" label="Lembrar-me" dense />
-          <div class="col">
-            <q-btn flat class="text-primary" @click="onForgot">Esqueci a senha</q-btn>
-          </div>
-        </div>
-
+        <q-checkbox
+          v-model="form.remember"
+          label="Lembrar-me"
+          dense
+        />
         <q-btn
           label="Entrar"
           type="submit"
           color="primary"
           class="full-width"
-          :loading="loading"
         />
 
         <q-separator />
@@ -73,12 +67,11 @@ const usuarioStore = useUsuarioStore()
 
 const formRef = ref(null)
 const form = ref({
-  email: '',
-  password: '',
+  usuario: '',
+  senha: '',
   remember: false
 })
 const showPassword = ref(false)
-const loading = ref(false)
 const error = ref('')
 
 function validateForm() {
@@ -93,22 +86,21 @@ async function onSubmit() {
     return
   }
 
-  loading.value = true
+  $q.loading.show()
   try {
-    // Simulação de chamada de API
-
-    api.post('/auth/login', {
-      email: form.value.email,
-      password: form.value.password
+    await api.post('/login', {
+      usuario: form.value.usuario,
+      senha: form.value.senha
     }).then(response => {
       // Suponha que a resposta contenha um token e informações do usuário
       const data = response.data;
 
 
+
       usuarioStore.setLogin({
-        usuario: "Junin",
-        email: form.value.email,
-        token: "nome"
+        nome: data.nome,
+        role: data.role,
+        token: data.token
       });
 
       // Exemplo: sucesso -> notificação e redirecionamento
@@ -118,27 +110,17 @@ async function onSubmit() {
       router.push("/")
 
     }).catch(err => {
+      $q.notify({ type: 'negative', message: 'Erro ao efetuar login. Verifique suas credenciais.' })
       throw new Error('Erro na autenticação');
     });
-
-
-
   } catch (err) {
     console.error(err)
     error.value = 'Falha ao autenticar. Verifique suas credenciais.'
   } finally {
-    loading.value = false
+    $q.loading.hide()
   }
 }
 
-function onForgot() {
-  $q.notify({ type: 'info', message: 'Fluxo de recuperação de senha aqui.' })
-}
-
-function onRegister() {
-  // Redirecione para a página de registro (ajuste conforme sua rota)
-  router.push({ name: 'register' }).catch(() => {})
-}
 </script>
 
 <style scoped>
@@ -146,7 +128,7 @@ function onRegister() {
   min-height: 100vh;
 }
 .q-card {
-  max-width: 480px;
+  max-width: 600px;
 }
 .full-width {
   width: 100%;

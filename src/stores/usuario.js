@@ -2,16 +2,15 @@ import { defineStore, acceptHMRUpdate } from "pinia";
 
 export const useUsuarioStore = defineStore("usuario", {
   state: () => ({
-    usuario: "",
-    email: "",
+    nome: "",
+    role: "",
     token: "",
   }),
   getters: {},
   actions: {
-    setLogin({ usuario, email, token }) {
-      console.log("setLogin", usuario, email, token);
-      this.usuario = usuario;
-      this.email = email;
+    setLogin({ nome, role, token }) {
+      this.nome = nome;
+      this.role = role;
       this.token = token;
     },
   },
