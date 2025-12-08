@@ -5,16 +5,8 @@
 
       <q-space />
 
-      <q-input
-        v-model="filter"
-        dense
-        outlined
-        rounded
-        placeholder="Pesquisar (nome, e‑mail, telefone)..."
-        debounce="300"
-        class="q-mr-sm"
-        style="max-width: 360px;"
-      >
+      <q-input v-model="filter" dense outlined rounded placeholder="Pesquisar (nome, e‑mail, telefone)..."
+        debounce="300" class="q-mr-sm" style="max-width: 360px;">
         <template v-slot:append>
           <q-icon name="search" />
         </template>
@@ -23,15 +15,7 @@
       <q-btn color="primary" icon="add" label="Adicionar" @click="onAdd" />
     </q-toolbar>
 
-    <q-table
-      :rows="filtered"
-      :columns="columns"
-      row-key="id"
-      class="text-center"
-      dense
-      flat
-      separator="horizontal"
-    >
+    <q-table :rows="filtered" :columns="columns" row-key="id" class="text-center" dense flat separator="horizontal">
       <template v-slot:body-cell-actions="props">
         <q-btn flat dense color="primary" icon="edit" @click="onEdit(props.row)" />
         <q-btn flat dense color="negative" icon="delete" class="q-ml-sm" @click="confirmDelete(props.row)" />
@@ -92,12 +76,12 @@ const filtered = computed(() => {
 
 function onAdd() {
   // ajuste a rota conforme sua aplicação (ex.: '/clientes/novo')
-  router.push({ name: 'ClientesCreate' }).catch(() => {})
+  router.push({ name: 'ClientesCreate' }).catch(() => { })
 }
 
 function onEdit(row) {
   // ajuste a rota conforme sua aplicação (ex.: '/clientes/:id/editar')
-  router.push({ name: 'ClientesEdit', params: { id: row.id } }).catch(() => {})
+  router.push({ name: 'ClientesEdit', params: { id: row.id } }).catch(() => { })
 }
 
 const deleteDialog = ref(false)
@@ -116,10 +100,10 @@ function deleteClient() {
   toDelete.value = null
 }
 
-const carregaLista = (async ()=>{
+const carregaLista = (async () => {
 
   try {
-    const response =  await api.get('/clients')
+    const response = await api.get('/clients')
     clients.value = response.data
   } catch (error) {
     console.error('Erro ao carregar clientes:', error)

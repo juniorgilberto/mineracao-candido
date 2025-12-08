@@ -31,8 +31,8 @@
           <q-input id="novoClienteModal" label="Novo Cliente" outlined type="text" class="q-mt-md" />
 
           <div class="flex row q-gutter-x-md">
-            <q-select outlined v-model="veiculoId" :options="veiculos" option-value="id" option-label="placa"
-              emit-value map-options :disable="!clientId" :loading="carregandoVeiculos" label="Veículo" class="q-mt-md"
+            <q-select outlined v-model="veiculoId" :options="veiculos" option-value="id" option-label="placa" emit-value
+              map-options :disable="!clientId" :loading="carregandoVeiculos" label="Veículo" class="q-mt-md"
               style="width: 30%" />
             <q-input label="ou digite nova placa" outlined type="text" class="q-mt-md" style="width: 60%" />
 
@@ -93,6 +93,9 @@
 
 import { api } from 'src/boot/axios'
 import { ref, watch, onMounted } from 'vue'
+import { useQuasar } from 'quasar'
+
+const $q = useQuasar()
 const clientes = ref([])
 const clientId = ref(null)
 const veiculos = ref([])
@@ -138,9 +141,29 @@ async function carregarMaterial() {
   }
 }
 
+const carregando = ref(false);
+
+async function carregarPedidos() {
+  const hide = $q.loading.show();
+
+  try {
+    pedidos.value = await getPedidos();
+  } finally {
+    hide();
+  }
+}
+
 async function getPedidos() {
-  const { data } = await api.get("/pedidos");
+  const hoje = new Date().toISOString().slice(0, 10);
+
+  const { data } = await api.get("/pedidos", {
+    params: {
+      from: hoje,
+      to: hoje
+    }
+  });
   return data;
+
 }
 
 watch(clientId, (id) => {
@@ -155,9 +178,9 @@ watch(clientId, (id) => {
 carregarCliente(),
   carregarMaterial()
 
-onMounted(async () => {
-  pedidos.value = await getPedidos();
-});
+onMounted(
+  carregarPedidos
+);
 
 
 </script>
