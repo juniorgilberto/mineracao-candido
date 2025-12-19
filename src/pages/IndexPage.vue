@@ -76,22 +76,25 @@
 
         <q-separator />
 
-        <div v-for="(v, placa) in cliente.veiculos" :key="placa" class="q-mt-md row justify-between">
-          <div>
-            <div class="text-bold">{{ placa }}</div>
-            <div class="text-grey-7">
-              {{ v.produto }} • {{ v.metragem }} m³
+        <q-card-section v-for="(v, placa, index) in cliente.veiculos" :key="placa" class="q-pa-none">
+          <q-separator v-if="index !== 0" />
+
+          <div class="row justify-between items-center q-pa-md">
+            <div>
+              <div class="text-bold">{{ placa }}</div>
+              <div class="text-grey-7">
+                {{ v.produto }} • {{ v.metragem }} m³
+              </div>
+            </div>
+
+            <div class="row items-center">
+              <q-badge color="blue-2" text-color="primary" class="q-mr-md">
+                {{ v.viagens }} viagem(s)
+              </q-badge>
+              <q-btn size="sm" color="primary" unelevated label="+ VIAGEM" />
             </div>
           </div>
-
-          <div class="row items-center">
-            <q-badge color="blue-2" text-color="primary" class="q-mr-md">
-              {{ v.viagens }} viagem(s)
-            </q-badge>
-            <q-btn size="sm" color="primary" unelevated label="+ Viagem" />
-          </div>
-          <q-separator />
-        </div>
+        </q-card-section>
       </q-card>
 
     </div>
@@ -170,10 +173,10 @@ async function getPedidos() {
   const hoje = new Date().toISOString().slice(0, 10);
 
   const { data } = await api.get("/pedidos", {
-    params: {
-      from: hoje,
-      to: hoje
-    }
+    // params: {
+    //   from: hoje,
+    //   to: hoje
+    // }
   });
   return data;
 
