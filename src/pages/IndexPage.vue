@@ -81,7 +81,7 @@
 
           <div class="row justify-between items-center q-pa-md">
             <div>
-              <div class="text-bold">{{ placa }}</div>
+              <div class="text-bold">{{ v.placa }}</div>
               <div class="text-grey-7">
                 {{ v.produto }} • {{ v.metragem }} m³
               </div>
@@ -89,7 +89,7 @@
 
             <div class="row items-center">
               <q-badge color="blue-2" text-color="primary" class="q-mr-md">
-                {{ v.viagens }} viagem(s)
+                {{ v.count }} viagem(s)
               </q-badge>
               <q-btn size="sm" color="primary" unelevated label="+ VIAGEM" />
             </div>
@@ -173,10 +173,10 @@ async function getPedidos() {
   const hoje = new Date().toISOString().slice(0, 10);
 
   const { data } = await api.get("/pedidos", {
-    // params: {
-    //   from: hoje,
-    //   to: hoje
-    // }
+    params: {
+      from: hoje,
+      to: hoje
+    }
   });
   return data;
 
@@ -188,6 +188,7 @@ const pedidosAgrupados = computed(() => {
   pedidos.value.forEach(p => {
     const clienteId = p.client.id
     const placa = p.veiculo?.placa || 'SEM PLACA'
+    const metragem = p.metragem
 
     if (!clientes[clienteId]) {
       clientes[clienteId] = {
@@ -196,15 +197,16 @@ const pedidosAgrupados = computed(() => {
       }
     }
 
-    if (!clientes[clienteId].veiculos[placa]) {
-      clientes[clienteId].veiculos[placa] = {
+    const veiculo = `placa: ${placa} || produto: ${p.produto.nome} || m³: ${metragem}`;
+    if (!clientes[clienteId].veiculos[veiculo]) {
+      clientes[clienteId].veiculos[veiculo] = {
+        placa: placa,
         produto: p.produto.nome,
-        metragem: p.metragem,
-        viagens: 0
+        metragem: metragem,
+        count: 0
       }
     }
-
-    clientes[clienteId].veiculos[placa].viagens++
+    clientes[clienteId].veiculos[veiculo].count++
   })
   console.log(clientes);
   return Object.values(clientes)
