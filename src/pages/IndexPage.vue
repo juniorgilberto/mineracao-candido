@@ -1,9 +1,15 @@
 <template>
   <q-page padding>
-    <q-toolbar class="row justify-center">
-      <div class="row justify-end items-center">
-        <div class="text-subtitle1 text-grey text-center col-12 col-md-auto">Hoje: {{ new Date().toLocaleDateString('pt-BR') }}</div>
-        <q-btn class="col-12 col-md-auto q-ml-md" label="+ Nova Venda" color="positive" @click="cardVenda = true" />
+    <q-toolbar class="row q-col-gutter-md justify-around">
+      <q-input dense outlined rounded placeholder="Pesquisar (cliente / placa / material...)" debounce="300"
+        class="q-mr-sm col-md-6" style="max-width: 360px;">
+        <template v-slot:append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+      <div class="row col-md-6 justify-end items-center">
+        <div class="text-subtitle1 text-grey q-mr-md">Hoje: {{ new Date().toLocaleDateString('pt-BR') }}</div>
+        <q-btn label="+ Nova Venda" color="positive" @click="cardVenda = true" />
       </div>
 
     </q-toolbar>
@@ -53,63 +59,65 @@
     </q-dialog>
 
 
-    <div v-if="!pedidos.length" class="text-center text-grey-7 q-mt-xl">
+    <div v-if="!pedidosAgrupados.length" class="text-center text-grey-7 q-mt-xl">
       Nenhuma venda lançada no dia de hoje. Clique em <b>Nova Venda</b> para cadastrar uma.
     </div>
-    <div v-else class="row justify-center q-col-gutter-sm">
-      <q-card v-for="cliente in pedidos" :key="cliente.nome" class="q-pa-md col-12 col-md-3 q-ma-md" flat bordered>
-        <div class="text-h6 text-primary text-bold">
-          {{ cliente.nome }}
-        </div>
+    <div v-else class="row justify-center q-mt-md q-gutter-md">
+      <q-card v-for="cliente in pedidosAgrupados" :key="cliente.nome" class="q-pa-md col-12 col-lg-3 " flat bordered>
+          <div class="text-h6 text-primary text-bold">
+            {{ cliente.nome }}
+          </div>
 
-        <div class="text-caption q-mb-sm">
-          {{ Object.keys(cliente.veiculos).length }} caminhão(ões)
-        </div>
+          <div class="text-caption q-mb-sm">
+            {{ Object.keys(cliente.veiculos).length }} caminhão(ões)
+          </div>
 
-        <q-separator />
+          <q-separator />
 
-        <q-card-section v-for="(v, placa, index) in cliente.veiculos" :key="placa" class="q-pa-none">
-          <q-separator v-if="index !== 0" />
+          <q-card-section v-for="(v, chave, index) in cliente.veiculos" :key="chave" class="q-pa-none">
+            <q-separator v-if="index !== 0" />
 
-          <div class="row justify-between items-center q-pa-md">
-            <div>
-              <div class="text-bold">{{ v.placa }}</div>
-              <div class="text-grey-7">
-                {{ v.produto }} • {{ v.metragem }} m³
+            <div class="row justify-between items-center q-pa-md">
+              <div>
+                <div class="text-bold">{{ v.placa }}</div>
+                <div class="text-grey-7">
+                  {{ v.produto }} • {{ v.metragem }} m³
+                </div>
+                <div class="text-grey-7">Carga: R$ {{ (v.metragem * v.produto_valor).toFixed(2) }}</div>
+              </div>
+
+              <div class="row items-center">
+                <q-badge color="blue-2" text-color="primary" class="q-mr-md">
+                  {{ v.viagens }} viagem(s)
+                </q-badge>
+                <q-btn size="md" color="primary" unelevated label="+ VIAGEM" @click="abrirModal(v, cliente)" />
               </div>
             </div>
+          </q-card-section>
 
-            <div class="row items-center">
-              <q-badge color="blue-2" text-color="primary" class="q-mr-md">
-                {{ v.viagens }} viagem(s)
-              </q-badge>
-              <q-btn size="sm" color="primary" unelevated label="+ VIAGEM" @click="abrirModal(pedidos)" />
-            </div>
-          </div>
-        </q-card-section>
       </q-card>
 
     </div>
 
     <q-dialog v-model="modalConfirmacao">
-  <q-card style="min-width: 350px">
-    <q-card-section class="text-h6">
-      Confirmar Viagem
-    </q-card-section>
+      <q-card style="min-width: 350px">
+        <q-card-section class="text-h6">
+          Confirmar Viagem
+        </q-card-section>
 
-    <q-card-section>
-      <div><b>Cliente:</b> {{ pedidoSelecionado.nome }}</div>
-      <div><b>Placa:</b> {{ pedidoSelecionado.placa || 'SEM PLACA' }}</div>
-      <div><b>Metragem:</b> {{ pedidoSelecionado.metrosCubicos }} m³</div>
-      <div><b>Valor:</b> R$ {{ pedidoSelecionado.valorProduto }}</div>
-    </q-card-section>
+        <q-card-section>
+          <div><b>Cliente:</b> {{ pedidoSelecionado?.nome }}</div>
+          <div><b>Placa:</b> {{ pedidoSelecionado?.dadosVeiculo.placa || 'SEM PLACA' }}</div>
+          <div><b>Metragem:</b> {{ pedidoSelecionado?.dadosVeiculo.metragem }} m³</div>
+          <div><b>Valor:</b> R$ {{ pedidoSelecionado?.dadosVeiculo.produto_valor }}</div>
+        </q-card-section>
 
-    <q-card-actions align="right">
-      <q-btn flat label="Cancelar" v-close-popup />
-      <q-btn label="Confirmar" color="primary" @click="confirmarViagem" />
-    </q-card-actions>
-  </q-card>
-</q-dialog>
+        <q-card-actions align="right">
+          <q-btn flat label="Cancelar" v-close-popup />
+          <q-btn label="Confirmar" color="primary" @click="confirmarViagem" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
 
 
 
@@ -119,7 +127,7 @@
 <script setup>
 
 import { api } from 'src/boot/axios'
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { useQuasar } from 'quasar'
 
 const $q = useQuasar()
@@ -139,14 +147,18 @@ const cardVenda = ref(false)
 const modalConfirmacao = ref(false)
 const pedidoSelecionado = ref({})
 
-function abrirModal (pedidos) {
-  pedidoSelecionado.value = pedidos
-  console.log(pedidos);
+function abrirModal(dadosVeiculo, cliente) {
+  pedidoSelecionado.value = {
+    nome: cliente.nome,
+    clientId: cliente.clienteId,
+    dadosVeiculo
+  }
+  console.log(pedidoSelecionado.value);
 
   modalConfirmacao.value = true
 }
 
-function confirmarViagem () {
+function confirmarViagem() {
   modalConfirmacao.value = false
   // ação da viagem
 }
@@ -183,9 +195,23 @@ async function carregarProduto() {
   }
 }
 
+async function getPedidos() {
+  const hoje = new Date().toISOString().slice(0, 10);
+
+  const { data } = await api.get("/pedidos/", {
+    // params: {
+    //   from: hoje,
+    //   to: hoje
+    // }
+  });
+  return data;
+
+}
 
 async function carregarPedidos() {
-  const hide = $q.loading.show();
+  const hide = $q.loading.show({
+    message: 'Carregando pedidos...'
+  });
 
   try {
     pedidos.value = await getPedidos();
@@ -195,28 +221,47 @@ async function carregarPedidos() {
   }
 }
 
-async function getPedidos() {
-  const hoje = new Date().toISOString().slice(0, 10);
+// MUDAR ISSO PARA O BACK-END
+const pedidosAgrupados = computed(() => {
+  const detalhes = {}
 
-  const { data } = await api.get("/pedidos/agrupados", {
-    params: {
-      from: hoje,
-      to: hoje
+  pedidos.value.forEach(p => {
+    const clienteId = p.client.id
+    const placa = p.veiculo?.placa || 'SEM PLACA'
+    const metragem = p.metragem
+
+    if (!detalhes[clienteId]) {
+      detalhes[clienteId] = {
+        nome: p.client.nome,
+        clienteId: clienteId,
+        veiculos: {}
+      }
     }
-  });
-  return data;
 
-}
+    const chave = `${placa}-${p.produto.nome}-${metragem}-${p.produto_valor}`;
+    if (!detalhes[clienteId].veiculos[chave]) {
+      detalhes[clienteId].veiculos[chave] = {
+        placa: placa,
+        produto: p.produto.nome,
+        metragem: metragem,
+        produto_valor: p.produto_valor,
+        viagens: 0
+      }
+    }
+    detalhes[clienteId].veiculos[chave].viagens++
+  })
+  return Object.values(detalhes)
+})
 
 const salvarVenda = async () => {
   try {
     await api.post('/pedidos', {
-    clientId: clientId.value,
-    veiculoId: veiculoId.value,
-    produtoId: produtoId.value,
-    metragem: metrosCubicos.value,
-    produto_valor: valorProduto.value
-  })
+      clientId: clientId.value,
+      veiculoId: veiculoId.value,
+      produtoId: produtoId.value,
+      metragem: metrosCubicos.value,
+      produto_valor: valorProduto.value
+    })
     $q.notify({
       type: 'positive',
       message: 'Venda cadastrada com sucesso!'
