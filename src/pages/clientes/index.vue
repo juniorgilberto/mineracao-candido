@@ -5,30 +5,76 @@
       :rows="filtered"
       :columns="columns"
       row-key="id"
-      class="text-center q-ma-lg"
+      :grid="$q.screen.lt.md"
+      class="text-center q-ma-lg no-shadow"
       @row-click="linhaCliente"
     >
-      <template v-slot:top-right>
-        <q-input dense debounce="300" v-model="filter" placeholder="Search">
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-        <q-btn
-          outline
-          class="q-ml-lg"
-          color="positive"
-          icon="add"
-          label="Adicionar"
-          @click="onAdd"
-        />
-      </template>
-      <template v-slot:top-left>
-        <div class="row items-center q-gutter-sm">
-          <q-icon name="people" size="sm" />
-          <div class="text-h6 text-weight-medium">Lista de Clientes</div>
+      <template v-slot:top>
+        <div class="col-12 row items-center justify-between q-gutter-y-sm">
+          <div class="row items-center q-gutter-sm">
+            <q-icon name="people" size="sm" color="primary" />
+            <div class="text-h6 text-weight-medium">Clientes</div>
+          </div>
+
+          <div class="row q-gutter-sm items-center full-width-mobile">
+            <q-input
+              dense
+              debounce="300"
+              v-model="filter"
+              placeholder="Pesquisar..."
+              bg-color="white"
+              class="col q-mr-sm"
+            >
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+            <q-btn
+              color="positive"
+              icon="add"
+              label="Novo Cliente"
+              unelevated
+              @click="onAdd"
+            />
+          </div>
         </div>
       </template>
+
+      <template v-slot:item="props">
+        <div class="q-pa-xs col-xs-12 col-sm-6">
+          <q-card flat bordered class="q-py-sm">
+            <q-item clickable @click="linhaCliente(null, props.row)">
+              <q-item-section>
+                <q-item-label class="text-weight-bold">{{
+                  props.row.nome
+                }}</q-item-label>
+              </q-item-section>
+
+              <q-item-section side>
+                <div class="row q-gutter-xs">
+                  <q-btn
+                    size="sm"
+                    flat
+                    round
+                    color="primary"
+                    icon="edit"
+                    @click.stop="onEdit(props.row)"
+                  />
+                  <q-btn
+                    size="sm"
+                    flat
+                    round
+                    color="negative"
+                    icon="delete"
+                    @click.stop="confirmDelete(props.row)"
+                  />
+                </div>
+              </q-item-section>
+            </q-item>
+          </q-card>
+        </div>
+      </template>
+
       <template v-slot:body-cell-actions="props">
         <q-td align="center">
           <q-btn
@@ -49,7 +95,10 @@
       </template>
 
       <template v-slot:no-data>
-        <div class="text-center q-pa-md">Nenhum cliente encontrado.</div>
+        <div class="full-width row flex-center text-grey-8 q-gutter-sm q-pa-lg">
+          <q-icon size="2em" name="sentiment_dissatisfied" />
+          <span>Nenhum cliente encontrado.</span>
+        </div>
       </template>
     </q-table>
 
@@ -77,7 +126,7 @@
 
     <!-- MODAL CADASTRAR/EDITAR CLIENTE -->
     <q-dialog v-model="dialogCliente" persistent>
-      <q-card style="min-width: 450px; border-radius: 8px">
+      <q-card style="width: 550px; max-width: 90vw; border-radius: 12px">
         <q-card-section class="bg-primary text-white row items-center">
           <div class="text-h6">
             <q-icon name="person_add" class="q-mr-sm" />
@@ -341,7 +390,7 @@
                     round
                     color="negative"
                     icon="delete"
-                    @click="deleteVeiculoDialog"
+                    @click="confirmVeiculoDelete(veiculo)"
                   />
                 </div>
               </q-item-section>
@@ -508,6 +557,32 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <!-- MODAL EXCLUIR VEÍCULO -->
+    <q-dialog v-model="deleteVeiculoDialog">
+      <q-card>
+        <q-card-section class="text-h6">Confirmar exclusão</q-card-section>
+
+        <q-card-section>
+          Deseja excluir o veículo com placa:
+          <strong v-if="toDeleteVeiculo"> {{ toDeleteVeiculo.placa }} </strong>?
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn
+            flat
+            label="Cancelar"
+            v-close-popup
+            @click="deleteVeiculoDialog = false"
+          />
+          <q-btn
+            color="negative"
+            :loading="loading"
+            label="Excluir"
+            @click="deleteVeiculo"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -549,7 +624,12 @@ const linhaSelecionadaCliente = ref(null);
 const filter = ref("");
 
 const columns = [
-  { name: "nome", label: "Nome", field: (row) => row.nome, sortable: true },
+  {
+    name: "nome",
+    label: "Nome",
+    field: (row) => row.nome,
+    sortable: true,
+  },
   { name: "email", label: "E‑mail", field: "email" },
   { name: "telefone", label: "Telefone", field: "telefone" },
   { name: "actions", label: "Ações", field: "actions", align: "center" },
@@ -742,12 +822,57 @@ function confirmVeiculo(row) {
   editVeiculoDialog.value = true;
 }
 
+const deleteVeiculoDialog = ref(false);
+const toDeleteVeiculo = ref(null);
+const confirmVeiculoDelete = (row) => {
+  toDeleteVeiculo.value = row;
+  deleteVeiculoDialog.value = true;
+};
+
+async function deleteVeiculo() {
+  loading.value = true;
+  if (!toDeleteVeiculo.value) return;
+
+  const veiculoId = toDeleteVeiculo.value.id;
+  try {
+    // 1. Chamada para a API
+    await api.delete(`/veiculos/${Number(veiculoId)}`);
+
+    if (
+      linhaSelecionadaCliente.value &&
+      linhaSelecionadaCliente.value.veiculos
+    ) {
+      linhaSelecionadaCliente.value.veiculos =
+        linhaSelecionadaCliente.value.veiculos.filter(
+          (v) => v.id !== veiculoId,
+        );
+    }
+
+    $q.notify({
+      type: "positive",
+      message: "Veículo excluído com sucesso da base de dados.",
+    });
+
+    deleteVeiculoDialog.value = false;
+    toDeleteVeiculo.value = null;
+  } catch (error) {
+    console.error("Erro ao excluir veículo:", error);
+
+    // Feedback de erro para o usuário
+    $q.notify({
+      type: "negative",
+      message: "Não foi possível excluir o veículo. Tente novamente.",
+    });
+  } finally {
+    loading.value = false;
+  }
+}
+
 async function editVeiculo() {
   loading.value = true;
   if (!toEditVeiculo.value) return;
 
   const veiculoId = toEditVeiculo.value.id;
-  console.log(toEditVeiculo.value);
   try {
     await api.put(`/veiculos/${veiculoId}`, { ...toEditVeiculo.value });
 
@@ -789,10 +914,7 @@ const addNovoVeiculo = async () => {
       metragem: Number(novoVeiculo.value.metragem),
       clientId: Number(linhaSelecionadaCliente.value.id),
     };
-    console.log(payload);
-
-
-    const response = await  api.post("/veiculos", payload);
+    const response = await api.post("/veiculos", payload);
 
     if (!linhaSelecionadaCliente.value.veiculos) {
       linhaSelecionadaCliente.value.veiculos = [];

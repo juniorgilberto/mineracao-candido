@@ -25,96 +25,154 @@
       </div>
     </q-toolbar>
 
-    <q-dialog v-model="cardVenda">
-      <q-card class="my-card">
-        <q-form
-          id="novaVenda"
-          class="q-pa-lg"
-          ref="formVendas"
-          @submit.prevent="salvarVenda"
-        >
-          <div class="text-h6 q-pb-sm">Nova Venda</div>
-          <q-select
-            id="clienteSelect"
-            outlined
-            v-model="clientId"
-            :options="clientes"
-            option-value="id"
-            option-label="nome"
-            label="Cliente"
-            emit-value
-            map-options
-          >
-            <template v-slot:no-option>
-              <q-item>
-                <q-item-section class="text-grey"> No results </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
-
-          <q-select
-            outlined
-            v-model="veiculoId"
-            :options="veiculos"
-            option-value="id"
-            option-label="placa"
-            emit-value
-            map-options
-            :disable="!clientId"
-            :loading="carregandoVeiculos"
-            label="Placa do Veículo"
-            class="q-mt-md"
-          >
-            <template v-slot:no-option>
-              <q-item>
-                <q-item-section class="text-grey">
-                  Nenhum veículo cadastrado.
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
-
-          <q-select
-            outlined
-            v-model="produtoId"
-            label="Produto"
-            :options="produtos"
-            option-value="id"
-            option-label="nome"
-            emit-value
-            map-options
-            class="q-mt-md col-5"
-          />
-          <q-input
-            label="M³"
-            outlined
-            type="number"
-            v-model="metrosCubicos"
-            class="q-mt-md"
-          />
-          <q-input
-            label="Valor M³"
-            prefix="R$"
-            outlined
-            type="number"
-            v-model="valorProduto"
-            option-label="nome"
-            class="q-mt-md"
-          />
-
-          <div class="text-center q-mt-md">
-            Valor venda: R$ {{ (valorProduto * metrosCubicos).toFixed(2) }}
+    <q-dialog
+      v-model="cardVenda"
+      transition-show="scale"
+      transition-hide="scale"
+    >
+      <q-card
+        class="my-card"
+        style="width: 500px; max-width: 90vw; border-radius: 12px"
+      >
+        <q-card-section class="bg-primary text-white row items-center">
+          <div class="text-h6 font-weight-bold">
+            <q-icon name="shopping_cart" class="q-mr-sm" size="28px" />
+            Nova Venda
           </div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
 
-          <q-btn
-            class="q-ma-md"
-            :loading="carregandoNovaVenda"
-            style="float: right"
-            label="Salvar Venda"
-            type="submit"
-            color="primary"
-          />
-        </q-form>
+        <q-card-section class="q-pa-md">
+          <q-form
+            id="novaVenda"
+            ref="formVendas"
+            @submit.prevent="salvarVenda"
+            class="row q-col-gutter-md"
+          >
+            <div class="col-12">
+              <q-select
+                id="clienteSelect"
+                outlined
+                dense
+                v-model="clientId"
+                :options="clientesFiltrados"
+                option-value="id"
+                option-label="nome"
+                label="Cliente"
+                emit-value
+                map-options
+                bg-color="grey-1"
+                use-input
+                input-debounce="300"
+                @filter="filtrarClientes"
+              >
+                <template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">
+                      Nenhum cliente encontrado
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+            </div>
+
+            <div class="col-12">
+              <q-select
+                outlined
+                dense
+                v-model="veiculoId"
+                :options="veiculos"
+                option-value="id"
+                option-label="placa"
+                emit-value
+                map-options
+                :disable="!clientId"
+                :loading="carregandoVeiculos"
+                label="Placa do Veículo"
+                bg-color="grey-1"
+              >
+                <template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey"
+                      >Nenhum veículo cadastrado.</q-item-section
+                    >
+                  </q-item>
+                </template>
+              </q-select>
+            </div>
+
+            <div class="col-12">
+              <q-select
+                outlined
+                dense
+                v-model="produtoId"
+                label="Produto"
+                :options="produtos"
+                option-value="id"
+                option-label="nome"
+                emit-value
+                map-options
+                bg-color="grey-1"
+              />
+            </div>
+
+            <div class="col-6">
+              <q-input
+                label="Quantidade (M³)"
+                outlined
+                dense
+                type="number"
+                v-model.number="metrosCubicos"
+                bg-color="grey-1"
+              />
+            </div>
+            <div class="col-6">
+              <q-input
+                label="Valor Unitário (M³)"
+                prefix="R$"
+                outlined
+                dense
+                type="number"
+                v-model.number="valorProduto"
+                bg-color="grey-1"
+              />
+            </div>
+
+            <div class="col-12">
+              <q-banner
+                dense
+                class="bg-blue-1 text-blue-9 rounded-borders text-center"
+              >
+                <template v-slot:avatar>
+                  <q-icon name="payments" color="blue-9" />
+                </template>
+                <span class="text-subtitle1 text-weight-bold">
+                  Total da Venda: R$
+                  {{ (valorProduto * metrosCubicos).toFixed(2) }}
+                </span>
+              </q-banner>
+            </div>
+
+            <div class="col-12 row justify-end q-mt-sm">
+              <q-btn
+                flat
+                label="Cancelar"
+                color="grey-7"
+                v-close-popup
+                class="q-mr-sm"
+              />
+              <q-btn
+                label="Salvar Venda"
+                type="submit"
+                color="secondary"
+                unelevated
+                :loading="carregandoNovaVenda"
+                class="q-px-lg"
+              />
+            </div>
+          </q-form>
+        </q-card-section>
       </q-card>
     </q-dialog>
 
@@ -159,7 +217,7 @@
             </div>
 
             <div class="row items-center">
-              <q-badge color="blue-2" text-color="primary" class="q-mr-md">
+              <q-badge color="blue-2" text-color="primary" class="q-mr-md q-pa-sm" >
                 {{ v.viagens }} viagem(s)
               </q-badge>
               <q-btn
@@ -175,30 +233,93 @@
       </q-card>
     </div>
 
-    <q-dialog v-model="modalConfirmacao">
-      <q-card style="min-width: 350px">
-        <div class="text-h6 q-pa-md">Confirmar Viagem</div>
-        <q-separator />
-        <q-card-section>
-          <div><b>Cliente:</b> {{ pedidoSelecionado?.nome }}</div>
-          <div>
-            <b>Placa:</b> {{ pedidoSelecionado?.detalhes.placa || "SEM PLACA" }}
+    <q-dialog
+      v-model="modalConfirmacao"
+      transition-show="scale"
+      transition-hide="scale"
+    >
+      <q-card style="width: 400px; max-width: 90vw; border-radius: 12px">
+        <q-card-section class="bg-primary text-white row items-center">
+          <div class="text-h6 font-weight-bold">
+            <q-icon name="check_circle" class="q-mr-sm" size="28px" />
+            Confirmar Viagem
           </div>
-          <div>
-            <b>Metragem:</b> {{ pedidoSelecionado?.detalhes.metragem }} m³
-          </div>
-          <div>
-            <b>Valor:</b> R$ {{ pedidoSelecionado?.detalhes.produtoValor }}
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <q-card-section class="q-pa-md">
+          <q-list class="bg-grey-1">
+            <q-item>
+              <q-item-section>
+                <q-item-label caption>Cliente</q-item-label>
+                <q-item-label class="text-weight-bold text-uppercase">
+                  {{ pedidoSelecionado?.nome }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-item>
+              <q-item-section>
+                <q-item-label caption>Veículo / Placa</q-item-label>
+                <q-item-label class="text-weight-bold">
+                  {{ pedidoSelecionado?.detalhes.placa || "SEM PLACA" }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-item class="q-mb-md">
+              <q-item-section>
+                <q-item-label caption>Metragem</q-item-label>
+                <q-item-label class="text-weight-bold">
+                  {{ pedidoSelecionado?.detalhes.metragem }} m³
+                </q-item-label>
+              </q-item-section>
+
+              <q-item-section side>
+                <q-item-label caption>Valor m³</q-item-label>
+                <q-item-label class="text-secondary text-weight-bolder">
+                  R$ {{ pedidoSelecionado?.detalhes.produtoValor.toFixed(2) }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-item>
+              <q-item-section class="items-center">
+                <q-item-label caption>Valor total da carga</q-item-label>
+                <q-item-label class="text-positive text-h6 text-weight-bold">
+                  R$
+                  {{
+                    (
+                      pedidoSelecionado?.detalhes.metragem *
+                      pedidoSelecionado?.detalhes.produtoValor
+                    ).toFixed(2)
+                  }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+
+          <div class="text-caption text-grey-7 q-mt-md text-center">
+            Certifique-se de que os dados estão corretos antes de confirmar.
           </div>
         </q-card-section>
 
-        <q-card-actions class="q-pa-md" align="right">
-          <q-btn flat label="Cancelar" v-close-popup />
+        <q-card-actions align="right" class="q-pa-md q-pt-none">
           <q-btn
+            flat
+            label="Cancelar"
+            color="grey-7"
+            v-close-popup
+            class="q-mr-sm"
+          />
+          <q-btn
+            unelevated
+            label="Confirmar Viagem"
+            color="secondary"
             :loading="carregandoDetalhes"
-            label="Confirmar"
-            color="primary"
             @click="confirmarViagem"
+            class="q-px-lg"
           />
         </q-card-actions>
       </q-card>
@@ -231,6 +352,24 @@ const cardVenda = ref(false);
 const modalConfirmacao = ref(false);
 const pedidoSelecionado = ref({});
 
+const clientesFiltrados = ref(clientes.value);
+
+const filtrarClientes = (val, update) => {
+  if (val === "") {
+    update(() => {
+      clientesFiltrados.value = clientes.value;
+    });
+    return;
+  }
+
+  update(() => {
+    const needle = val.toLowerCase();
+    clientesFiltrados.value = clientes.value.filter(
+      (v) => v.nome.toLowerCase().indexOf(needle) > -1,
+    );
+  });
+};
+
 const pedidosFiltrados = computed(() => {
   const termo = filtro.value.toLowerCase().trim();
 
@@ -245,7 +384,7 @@ const pedidosFiltrados = computed(() => {
           const produto = detalhe.produto?.toLowerCase() || "";
 
           return placa.includes(termo) || produto.includes(termo);
-        })
+        }),
       );
 
       // 2. Verificamos se o nome do cliente bate com a busca
@@ -434,7 +573,7 @@ watch(produtoId, (id) => {
   valorProduto.value = produto.valor_m3 || null;
   valorProduto.value = Number(valorProduto.value).toFixed(2);
 });
-carregarCliente(), carregarProduto();
+(carregarCliente(), carregarProduto());
 
 onMounted(carregarPedidos);
 </script>

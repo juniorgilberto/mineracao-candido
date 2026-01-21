@@ -1,11 +1,16 @@
 <template>
   <q-page padding>
-
     <!-- Toolbar -->
     <q-toolbar class="bg-primary text-white">
       <q-toolbar-title>Relatórios</q-toolbar-title>
       <div class="row items-center q-gutter-sm">
-        <q-btn dense flat icon="download" label="Exportar CSV" @click="exportCSV" />
+        <q-btn
+          dense
+          flat
+          icon="download"
+          label="Exportar CSV"
+          @click="exportCSV"
+        />
         <q-btn dense flat icon="print" label="Imprimir" @click="printTable" />
       </div>
     </q-toolbar>
@@ -14,10 +19,37 @@
     <q-card class="q-mt-md">
       <q-card-section>
         <div class="row wrap q-gutter-md">
-          <q-input dense outlined v-model="filtroBusca" label="Pesquisar (cliente, descrição)" clearable />
-          <q-select dense outlined v-model="filtroStatus" :options="statusOptions" label="Status" emit-value map-options clearable />
-          <q-input dense outlined v-model="filtroDataInicio" type="date" label="Data início" />
-          <q-input dense outlined v-model="filtroDataFim" type="date" label="Data fim" />
+          <q-input
+            dense
+            outlined
+            v-model="filtroBusca"
+            label="Pesquisar (cliente, descrição)"
+            clearable
+          />
+          <q-select
+            dense
+            outlined
+            v-model="filtroStatus"
+            :options="statusOptions"
+            label="Status"
+            emit-value
+            map-options
+            clearable
+          />
+          <q-input
+            dense
+            outlined
+            v-model="filtroDataInicio"
+            type="date"
+            label="Data início"
+          />
+          <q-input
+            dense
+            outlined
+            v-model="filtroDataFim"
+            type="date"
+            label="Data fim"
+          />
           <q-btn dense color="primary" label="Aplicar" @click="page = 1" />
           <q-btn dense flat label="Limpar" @click="limparFiltros" />
         </div>
@@ -26,53 +58,41 @@
 
     <!-- Tabela -->
     <q-card class="q-mt-md">
-      <q-card-section>
+      <div class="q-pa-md">
         <q-table
-          flat
+          title="Relatório de Pedidos"
+          :rows="rows"
           :columns="columns"
-          :rows="paginatedRows"
           row-key="id"
-          @row-click="abrirDetalhes"
-          separator="horizontal"
+          v-model:pagination="pagination"
+          flat
+          bordered
         >
-          <template v-slot:top-right>
-            <div class="text-subtitle2">Total visível: {{ formatCurrency(totalVisivel) }}</div>
+          <template v-slot:body-cell-status="props">
+            <q-td :props="props">
+              <q-chip
+                :color="props.value === 'PENDENTE' ? 'orange' : 'green'"
+                text-color="white"
+                dense
+                square
+              >
+                {{ props.value }}
+              </q-chip>
+            </q-td>
           </template>
 
-          <template v-slot:body-cell-valor="props">
-            <q-td :props="props" align="right">{{ formatCurrency(props.row.valor) }}</q-td>
-          </template>
-
-          <template v-slot:body-cell-data="props">
-            <q-td :props="props">{{ formatDate(props.row.data) }}</q-td>
-          </template>
-
-          <template v-slot:no-data>
-            <div class="q-pa-md">Nenhum registro encontrado.</div>
+          <template v-slot:body-cell-valor_total="props">
+            <q-td :props="props">
+              {{ formatCurrency(props.value) }}
+            </q-td>
           </template>
         </q-table>
-
-        <!-- Paginação custom -->
-        <div class="row items-center justify-between q-mt-md">
-          <div>
-            <q-select dense outlined v-model="rowsPerPage" :options="rowsPerPageOptions" style="width:120px" />
-          </div>
-          <div>
-            <q-pagination
-              v-model="page"
-              :max="pageCount"
-              boundary-numbers
-              max-pages="7"
-              color="primary"
-            />
-          </div>
-        </div>
-      </q-card-section>
+      </div>
     </q-card>
 
     <!-- Dialog de detalhes -->
     <q-dialog v-model="dialog">
-      <q-card style="min-width: 350px; max-width: 700px;">
+      <q-card style="min-width: 350px; max-width: 700px">
         <q-card-section>
           <div class="text-h6">Detalhes do relatório</div>
         </q-card-section>
@@ -84,7 +104,9 @@
             <div><strong>Descrição:</strong> {{ detalhe.descricao }}</div>
             <div><strong>Data:</strong> {{ formatDate(detalhe.data) }}</div>
             <div><strong>Status:</strong> {{ detalhe.status }}</div>
-            <div><strong>Valor:</strong> {{ formatCurrency(detalhe.valor) }}</div>
+            <div>
+              <strong>Valor:</strong> {{ formatCurrency(detalhe.valor) }}
+            </div>
           </div>
         </q-card-section>
 
@@ -93,54 +115,59 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-
   </q-page>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { uid } from 'quasar'
+import { ref, computed, onMounted } from 'vue'
+import { api } from 'src/boot/axios'
+import { date } from 'quasar'
 
 /* Colunas da tabela */
 const columns = [
-  { name: 'id', label: 'ID', field: 'id', align: 'left', sortable: true },
-  { name: 'cliente', label: 'Cliente', field: 'cliente', sortable: true },
-  { name: 'descricao', label: 'Descrição', field: 'descricao', sortable: false },
-  { name: 'data', label: 'Data', field: 'data', sortable: true },
-  { name: 'status', label: 'Status', field: 'status', sortable: true },
-  { name: 'valor', label: 'Valor', field: 'valor', sortable: true, align: 'right' }
+  { name: 'id', align: 'left', label: 'ID', field: 'id', sortable: true },
+  {
+    name: 'data',
+    align: 'left',
+    label: 'Data',
+    field: 'data_do_pedido',
+    format: val => date.formatDate(val, 'DD/MM/YYYY HH:mm'),
+    sortable: true,
+    sort: (a, b) => new Date(a) - new Date(b)
+  },
+  { name: 'cliente', align: 'left', label: 'Cliente', field: row => row.client.nome, sortable: true },
+  { name: 'produto', align: 'left', label: 'Produto', field: row => row.produto.nome, sortable: true },
+  { name: 'placa', align: 'left', label: 'Veículo', field: row => row.veiculo ? row.veiculo.placa : 'SEM PLACA' },
+  { name: 'metragem', align: 'center', label: 'Metragem (m³)', field: 'metragem' },
+  { name: 'valor_total', align: 'right', label: 'Total', field: 'valor_total', sortable: true },
+  { name: 'status', align: 'center', label: 'Status', field: 'status' }
 ]
 
 /* Opções de status */
 const statusOptions = [
   { label: 'Todos', value: null },
-  { label: 'Pendente', value: 'Pendente' },
-  { label: 'Concluído', value: 'Concluído' },
-  { label: 'Cancelado', value: 'Cancelado' }
+  { label: 'Pendente', value: 'PENDENTE' },
+  { label: 'Pago', value: 'PAGO' },
+  { label: 'Em Fechamento', value: 'EM_FECHAMENTO' }
 ]
+const rows = ref([])
 
-/* Dados fictícios iniciais */
-function criarMock(qt = 57) {
-  const arr = []
-  const statuses = ['Pendente', 'Concluído', 'Cancelado']
-  const nomes = ['Empresa A', 'Empresa B', 'João Silva', 'Maria Souza', 'Loja X']
-  for (let i = 0; i < qt; i++) {
-    const dias = Math.floor(Math.random() * 365)
-    const data = new Date()
-    data.setDate(data.getDate() - dias)
-    arr.push({
-      id: uid(),
-      cliente: nomes[Math.floor(Math.random() * nomes.length)],
-      descricao: 'Serviço #' + (i + 1),
-      data: data.toISOString().slice(0, 10),
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      valor: Number((Math.random() * 5000).toFixed(2))
-    })
+async function getPedidos() {
+  try {
+    const response = await api.get('/pedidos')
+    rows.value = response.data
+    console.log(response.data);
+
+  } catch (error) {
+    console.error('Erro ao buscar relatórios:', error)
   }
-  return arr
 }
+const pagination = ref({
+  sortBy: 'data',    // Nome da coluna definida em 'name'
+  descending: true,  // 'true' para o mais recente primeiro
+  rowsPerPage: 10
+})
 
-const rows = ref(criarMock())
 
 /* Filtros */
 const filtroBusca = ref('')
@@ -156,49 +183,6 @@ const limparFiltros = () => {
   page.value = 1
 }
 
-/* Paginação */
-const page = ref(1)
-const rowsPerPage = ref(10)
-const rowsPerPageOptions = [5, 10, 20, 50]
-
-const filteredRows = computed(() => {
-  return rows.value.filter(r => {
-    if (filtroStatus.value && r.status !== filtroStatus.value) return false
-    if (filtroBusca.value) {
-      const s = filtroBusca.value.toLowerCase()
-      if (!(r.cliente.toLowerCase().includes(s) || r.descricao.toLowerCase().includes(s))) {
-        return false
-      }
-    }
-    if (filtroDataInicio.value) {
-      if (r.data < filtroDataInicio.value) return false
-    }
-    if (filtroDataFim.value) {
-      if (r.data > filtroDataFim.value) return false
-    }
-    return true
-  })
-})
-
-const pageCount = computed(() => Math.max(1, Math.ceil(filteredRows.value.length / rowsPerPage.value)))
-
-const paginatedRows = computed(() => {
-  const start = (page.value - 1) * rowsPerPage.value
-  return filteredRows.value.slice(start, start + rowsPerPage.value)
-})
-
-/* Totais */
-const totalVisivel = computed(() => paginatedRows.value.reduce((s, r) => s + r.valor, 0))
-const totalGeral = computed(() => filteredRows.value.reduce((s, r) => s + r.valor, 0))
-
-/* Dialog de detalhes */
-const dialog = ref(false)
-const detalhe = ref({})
-
-const abrirDetalhes = (evt) => {
-  detalhe.value = evt
-  dialog.value = true
-}
 
 /* Utilitários */
 function formatCurrency(v) {
@@ -280,8 +264,14 @@ function printTable() {
   win.focus()
   win.print()
 }
+
+onMounted(() => {
+  getPedidos()
+})
 </script>
 
 <style scoped>
-.q-page { min-height: 100vh; }
+.q-page {
+  min-height: 100vh;
+}
 </style>
