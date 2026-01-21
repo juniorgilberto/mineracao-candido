@@ -110,6 +110,7 @@ async function onSubmit() {
       router.push("/")
 
     }).catch(err => {
+
       $q.notify({ type: 'negative', message: 'Erro ao efetuar login. Verifique suas credenciais.' })
       throw new Error('Erro na autenticação');
     });

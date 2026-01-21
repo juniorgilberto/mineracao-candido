@@ -23,7 +23,7 @@
               v-model="filter"
               placeholder="Pesquisar..."
               bg-color="white"
-              class="col q-mr-sm"
+              class="col q-mr-md"
             >
               <template v-slot:append>
                 <q-icon name="search" />

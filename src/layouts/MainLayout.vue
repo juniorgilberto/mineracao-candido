@@ -9,9 +9,6 @@
               <div class="gt-xs">Mineração Cândido</div>
             </div>
           </q-toolbar-title>
-
-          <q-space />
-
           <div class="gt-sm">
             <q-btn stretch flat icon-right="home" label="Home" to="/" />
             <q-btn stretch flat icon-right="people" label="Clientes" to="/clientes" />

@@ -431,12 +431,14 @@ async function confirmarViagem() {
   try {
     const { clientId, detalhes } = pedidoSelecionado.value;
     const { produtoId, veiculoId, metragem, produtoValor } = detalhes;
+    console.log(produtoValor);
+
     await api.post("/pedidos", {
       clientId,
+      produto_valor: produtoValor,
       produtoId,
       veiculoId,
       metragem,
-      produtoValor,
     });
     $q.notify({
       type: "positive",
