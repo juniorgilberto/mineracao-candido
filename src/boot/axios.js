@@ -8,7 +8,7 @@ import { useUsuarioStore } from "src/stores/usuario";
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: "https://mineracao-candido-api.vercel.app/" });
+const api = axios.create({ baseURL: "http://localhost:3000" });
 
 api.interceptors.request.use(function (config) {
   const usuarioStore = useUsuarioStore();

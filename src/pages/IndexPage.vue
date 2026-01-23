@@ -218,7 +218,7 @@
 
             <div class="row items-center">
               <q-badge color="blue-2" text-color="primary" class="q-mr-md q-pa-sm" >
-                {{ v.viagens }} viagem(s)
+                {{ v.viagens }} viagem(ns)
               </q-badge>
               <q-btn
                 size="md"
@@ -329,9 +329,8 @@
 
 <script setup>
 import { api } from "src/boot/axios";
-import { ref, watch, onMounted, computed } from "vue";
+import { ref, watch, onMounted, computed, onUnmounted } from "vue";
 import { useQuasar } from "quasar";
-
 const $q = useQuasar();
 const filtro = ref("");
 const clientes = ref([]);
@@ -353,6 +352,8 @@ const modalConfirmacao = ref(false);
 const pedidoSelecionado = ref({});
 
 const clientesFiltrados = ref(clientes.value);
+
+let pollingTimer = null;
 
 const filtrarClientes = (val, update) => {
   if (val === "") {
@@ -516,6 +517,15 @@ async function carregarPedidos() {
   }
 }
 
+async function refreshDados() {
+  try {
+    const novosDados = await getPedidos();
+    pedidos.value = novosDados;
+  } catch (e) {
+    console.error("Erro ao atualizar dados em segundo plano");
+  }
+}
+
 const salvarVenda = async () => {
   if (carregandoNovaVenda.value) return;
 
@@ -577,7 +587,18 @@ watch(produtoId, (id) => {
 });
 (carregarCliente(), carregarProduto());
 
-onMounted(carregarPedidos);
+onMounted(() => {
+  carregarPedidos();
+
+  // Atualiza os dados a cada 30 segundos automaticamente
+  pollingTimer = setInterval(refreshDados, 30000);
+});
+
+onUnmounted(() => {
+  // Limpa o timer quando o usuário sai da página
+  if (pollingTimer) clearInterval(pollingTimer);
+});
+
 </script>
 
 <style scoped>
