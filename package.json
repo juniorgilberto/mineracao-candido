@@ -1,8 +1,8 @@
 {
   "name": "mineracao-candido-quasar",
   "version": "0.0.1",
-  "description": "A Quasar Project",
-  "productName": "Quasar App",
+  "description": "Sistema ERP para Mineração Cândido",
+  "productName": "Mineração Cândido",
   "author": "juniorgilberto <56450453+juniorgilberto@users.noreply.github.com>",
   "type": "module",
   "private": true,

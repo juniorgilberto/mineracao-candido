@@ -3,7 +3,7 @@
     <q-card class="q-pa-md" style="max-width: 420px; width: 95%">
       <q-toolbar class="q-pa-none">
         <div class="row items-center justify-center" style="width: 100%;">
-          <q-icon name="img:public/logo-preta.svg" style="width: 250px; height: auto;" />
+          <q-icon name="img:logo-preta.svg" style="width: 250px; height: auto;" />
         </div>
       </q-toolbar>
 

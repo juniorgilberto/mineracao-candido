@@ -60,6 +60,9 @@ export default defineConfig((/* ctx */) => {
       //   [ 'package-name', { ..pluginOptions.. }, { server: true, client: true } ]
       // ]
     },
+    htmlVariables: {
+      title: 'Mineração Cândido' // Altere aqui
+    },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#devserver
     devServer: {
@@ -150,6 +153,17 @@ export default defineConfig((/* ctx */) => {
       // extendPWACustomSWConf (esbuildConf) {},
       // extendGenerateSWOptions (cfg) {},
       // extendInjectManifestOptions (cfg) {}
+
+      manifest: {
+        // 2. Nome do App quando instalado no celular
+        name: 'Mineração Cândido',
+        short_name: 'Mineração Cândido',
+        description: 'Descrição da sua aplicação',
+        display: 'standalone',
+        orientation: 'portrait',
+        background_color: '#ffffff',
+        theme_color: '#027be3', // Cor da barra de status no celular
+      }
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-cordova-apps/configuring-cordova
