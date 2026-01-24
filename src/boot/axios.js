@@ -31,6 +31,18 @@ api.interceptors.request.use(function (config) {
 
   return config;
 });
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response && error.response.status === 401) {
+      // Token expirou ou é inválido!
+      const usuarioStore = useUsuarioStore(); // Importe sua store aqui
+      usuarioStore.logout(); // Crie uma action logout que limpa os storages
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default defineBoot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api

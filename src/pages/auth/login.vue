@@ -88,35 +88,29 @@ async function onSubmit() {
 
   $q.loading.show()
   try {
-    await api.post('/login', {
+    const response = await api.post('/login', {
       usuario: form.value.usuario,
       senha: form.value.senha
-    }).then(response => {
-      // Suponha que a resposta contenha um token e informações do usuário
-      const data = response.data;
+    })
 
+    const data = response.data
+    const remember = form.value.remember
 
+    // Chamamos a store passando a opção de "lembrar"
+    usuarioStore.setLogin({
+      nome: data.nome,
+      role: data.role,
+      token: data.token
+    }, remember);
 
-      usuarioStore.setLogin({
-        nome: data.nome,
-        role: data.role,
-        token: data.token
-      });
+    $q.notify({ type: 'positive', message: 'Login efetuado com sucesso' })
+    router.push("/")
 
-      // Exemplo: sucesso -> notificação e redirecionamento
-      $q.notify({ type: 'positive', message: 'Login efetuado com sucesso' })
-
-      // Redirecione para a página principal (ajuste conforme sua rota)
-      router.push("/")
-
-    }).catch(err => {
-
-      $q.notify({ type: 'negative', message: 'Erro ao efetuar login. Verifique suas credenciais.' })
-      throw new Error('Erro na autenticação');
-    });
   } catch (err) {
     console.error(err)
-    error.value = 'Falha ao autenticar. Verifique suas credenciais.'
+    const msg = err.response?.data?.message || 'Falha ao autenticar. Verifique suas credenciais.'
+    $q.notify({ type: 'negative', message: msg })
+    error.value = msg
   } finally {
     $q.loading.hide()
   }

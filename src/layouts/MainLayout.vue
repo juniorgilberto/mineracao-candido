@@ -56,14 +56,18 @@
 <script setup>
 import { ref } from 'vue'
 const leftDrawerOpen = ref(false)
+import { useRouter } from 'vue-router'
+const router = useRouter()
+import { useUsuarioStore } from 'src/stores/usuario'
+const usuarioStore = useUsuarioStore()
 
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value
 }
 
 function logout() {
-  localStorage.removeItem('usuario');
-  window.location.href = '/login';
+  usuarioStore.logout();
+  router.push('/login');
 }
 </script>
 <style>
