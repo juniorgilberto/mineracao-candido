@@ -61,7 +61,8 @@ export default defineConfig((/* ctx */) => {
       // ]
     },
     htmlVariables: {
-      title: 'Mineração Cândido' // Altere aqui
+      title: "Mineração Cândido",
+      lang: "pt-BR"
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#devserver
@@ -74,21 +75,21 @@ export default defineConfig((/* ctx */) => {
     framework: {
       config: {
         brand: {
-          primary: '#1A1A1A',   // Preto Carbono (Header, Menus, Títulos)
-          secondary: '#F29100', // Laranja/Ouro (Botões de Destaque, Ícones)
-          accent: '#2E7D32',    // Verde (Sucesso, Vendas, Confirmação)
+          primary: "#1A1A1A", // Preto Carbono (Header, Menus, Títulos)
+          secondary: "#F29100", // Laranja/Ouro (Botões de Destaque, Ícones)
+          accent: "#2E7D32", // Verde (Sucesso, Vendas, Confirmação)
 
-          dark: '#1d1d1d',
+          dark: "#1d1d1d",
 
-          positive: '#2E7D32',
-          negative: '#D32F2F',
-          info: '#31CCEC',
-          warning: '#F2C037'
-        }
+          positive: "#2E7D32",
+          negative: "#D32F2F",
+          info: "#31CCEC",
+          warning: "#F2C037",
+        },
       },
 
       // iconSet: 'material-icons', // Quasar icon set
-      // lang: 'en-US', // Quasar language pack
+      lang: "pt-BR",
 
       // For special cases outside of where the auto-import strategy can have an impact
       // (like functional components as one of the examples),
@@ -155,15 +156,44 @@ export default defineConfig((/* ctx */) => {
       // extendInjectManifestOptions (cfg) {}
 
       manifest: {
-        // 2. Nome do App quando instalado no celular
-        name: 'Mineração Cândido',
-        short_name: 'Mineração Cândido',
-        description: 'Descrição da sua aplicação',
-        display: 'standalone',
-        orientation: 'portrait',
-        background_color: '#ffffff',
-        theme_color: '#027be3', // Cor da barra de status no celular
-      }
+        name: "Mineração Cândido",
+        short_name: "Min. Cândido", // Reduzi para evitar que o celular corte o nome
+        description: "Gestão e monitoramento de mineração",
+        display: "standalone",
+        orientation: "portrait",
+        background_color: "#ffffff",
+        theme_color: "#027be3",
+
+        // Adicione esta parte se quiser garantir que o ícone preencha a tela sem bordas estranhas
+        icons: [
+          {
+            src: "icons/icon-128x128.png",
+            sizes: "128x128",
+            type: "image/png",
+          },
+          {
+            src: "icons/icon-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "icons/icon-256x256.png",
+            sizes: "256x256",
+            type: "image/png",
+          },
+          {
+            src: "icons/icon-384x384.png",
+            sizes: "384x384",
+            type: "image/png",
+          },
+          {
+            src: "icons/icon-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any maskable", // ISSO AQUI remove o fundo branco no Android!
+          },
+        ],
+      },
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-cordova-apps/configuring-cordova
