@@ -156,54 +156,6 @@ export default defineConfig((/* ctx */) => {
       // extendPWACustomSWConf (esbuildConf) {},
       // extendGenerateSWOptions (cfg) {},
       // extendInjectManifestOptions (cfg) {}
-
-      manifest: {
-        // Nome na tela de instalação
-        name: "Mineração Cândido",
-
-        // O NOME QUE APARECE EMBAIXO DO ÍCONE (Máximo 12 caracteres recomendado)
-        short_name: "Min. Cândido",
-
-        description: "Sistema ERP para Mineração Cândido",
-        display: "standalone",
-        orientation: "portrait",
-        background_color: "#ffffff",
-        theme_color: "#1A1A1A",
-
-        // Adicione esta parte se quiser garantir que o ícone preencha a tela sem bordas estranhas
-        icons: [
-          {
-            src: "icons/icon-128x128.png",
-            sizes: "128x128",
-            type: "image/png",
-            purpose: "any maskable"
-          },
-          {
-            src: "icons/icon-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-            purpose: "any maskable"
-          },
-          {
-            src: "icons/icon-256x256.png",
-            sizes: "256x256",
-            type: "image/png",
-            purpose: "any maskable"
-          },
-          {
-            src: "icons/icon-384x384.png",
-            sizes: "384x384",
-            type: "image/png",
-            purpose: "any maskable"
-          },
-          {
-            src: "icons/icon-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any maskable", // ISSO AQUI remove o fundo branco no Android!
-          },
-        ],
-      },
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-cordova-apps/configuring-cordova
