@@ -62,7 +62,7 @@ export default defineConfig((/* ctx */) => {
     },
     htmlVariables: {
       title: "Mineração Cândido",
-      lang: "pt-BR"
+      lang: "pt-BR",
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#devserver
@@ -156,13 +156,19 @@ export default defineConfig((/* ctx */) => {
       // extendInjectManifestOptions (cfg) {}
 
       manifest: {
+        id: "mineracao-candido",
+
+        // Nome na tela de instalação
         name: "Mineração Cândido",
-        short_name: "Min. Cândido", // Reduzi para evitar que o celular corte o nome
-        description: "Gestão e monitoramento de mineração",
+
+        // O NOME QUE APARECE EMBAIXO DO ÍCONE (Máximo 12 caracteres recomendado)
+        short_name: "Min. Cândido",
+
+        description: "Sistema ERP para Mineração Cândido",
         display: "standalone",
         orientation: "portrait",
         background_color: "#ffffff",
-        theme_color: "#027be3",
+        theme_color: "#1A1A1A",
 
         // Adicione esta parte se quiser garantir que o ícone preencha a tela sem bordas estranhas
         icons: [
@@ -170,21 +176,25 @@ export default defineConfig((/* ctx */) => {
             src: "icons/icon-128x128.png",
             sizes: "128x128",
             type: "image/png",
+            purpose: "any maskable"
           },
           {
             src: "icons/icon-192x192.png",
             sizes: "192x192",
             type: "image/png",
+            purpose: "any maskable"
           },
           {
             src: "icons/icon-256x256.png",
             sizes: "256x256",
             type: "image/png",
+            purpose: "any maskable"
           },
           {
             src: "icons/icon-384x384.png",
             sizes: "384x384",
             type: "image/png",
+            purpose: "any maskable"
           },
           {
             src: "icons/icon-512x512.png",
