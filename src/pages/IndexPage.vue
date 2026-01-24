@@ -461,12 +461,21 @@ async function confirmarViagem() {
   }
 }
 
-async function carregarCliente() {
+async function carregarDadosIniciais() {
   try {
-    const { data } = await api.get("/clients");
-    clientes.value = data;
+    // Executa ambas as chamadas simultaneamente (mais rápido)
+    const [resClientes, resProdutos] = await Promise.all([
+      api.get("/clients"),
+      api.get("/produtos")
+    ]);
+
+    // Atribui os dados após o término de ambas
+    clientes.value = resClientes.data;
+    produtos.value = resProdutos.data;
+
   } catch (error) {
-    console.error("Erro ao carregar clientes:", error);
+    console.error("Erro ao carregar dados iniciais:", error);
+    // Aqui você poderia adicionar um aviso ao usuário (ex: $q.notify)
   }
 }
 
@@ -484,14 +493,6 @@ async function carregarVeiculos(clientId) {
   }
 }
 
-async function carregarProduto() {
-  try {
-    const { data } = await api.get("/produtos");
-    produtos.value = data;
-  } catch (error) {
-    console.error("Erro ao carregar materiais:", error);
-  }
-}
 
 async function getPedidos() {
   const hoje = new Date().toISOString().slice(0, 10);
@@ -585,8 +586,7 @@ watch(produtoId, (id) => {
   valorProduto.value = produto.valor_m3 || null;
   valorProduto.value = Number(valorProduto.value).toFixed(2);
 });
-(carregarCliente(), carregarProduto());
-
+carregarDadosIniciais();
 onMounted(() => {
   carregarPedidos();
 

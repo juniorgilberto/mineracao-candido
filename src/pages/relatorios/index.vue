@@ -21,8 +21,8 @@
           <q-item
             clickable
             v-ripple
-            :active="tab === 'fechamentos'"
-            @click="tab = 'fechamentos'"
+            :active="tab === 'fechamentosAtivos'"
+            @click="tab = 'fechamentosAtivos'"
             active-class="bg-blue-1 text-blue-8"
           >
             <q-item-section avatar>
@@ -33,6 +33,19 @@
               <q-badge color="orange" rounded />
             </q-item-section>
           </q-item>
+
+          <q-item
+            clickable
+            v-ripple
+            :active="tab === 'fechamentosPagos'"
+            @click="tab = 'fechamentosPagos'"
+            active-class="bg-blue-1 text-blue-8"
+          >
+            <q-item-section avatar>
+              <q-icon name="receipt_long" />
+            </q-item-section>
+            <q-item-section>Fechamentos Pagos</q-item-section>
+          </q-item>
         </q-list>
       </div>
 
@@ -40,7 +53,9 @@
         <q-tab-panels v-model="tab" animated class="bg-transparent">
           <q-tab-panel name="pedidos" class="q-pa-none">
             <q-card flat bordered class="q-mb-md">
-              <q-card-section class="row q-col-gutter-sm items-center justify-between">
+              <q-card-section
+                class="row q-col-gutter-sm items-center justify-between"
+              >
                 <div class="col-12 col-sm-6 col-md-2">
                   <q-input
                     v-model="filtros.cliente"
@@ -152,7 +167,10 @@
                       flat
                       bordered
                       class="shadow-1 full-height"
-                      style="border-radius: 8px ; border-left: 4px solid var(--q-positive)"
+                      style="
+                        border-radius: 8px;
+                        border-left: 4px solid var(--q-positive);
+                      "
                     >
                       <q-card-section class="q-pa-sm row items-center no-wrap">
                         <q-icon
@@ -197,7 +215,9 @@
                           </div>
                         </div>
                         <div class="text-right">
-                          <span class="text-caption text-grey-7">Viagens: </span>
+                          <span class="text-caption text-grey-7"
+                            >Viagens:
+                          </span>
                           <span class="text-weight-bold">{{
                             resumoGeral.qtdCascalho
                           }}</span>
@@ -246,7 +266,9 @@
                           </div>
                         </div>
                         <div class="text-right">
-                          <span class="text-caption text-grey-7">Viagens: </span>
+                          <span class="text-caption text-grey-7"
+                            >Viagens:
+                          </span>
                           <span class="text-weight-bold">{{
                             resumoGeral.qtdTerra
                           }}</span>
@@ -332,6 +354,11 @@
                   </q-chip>
                 </q-td>
               </template>
+              <template v-slot:body-cell-produto_valor="props">
+                <q-td :props="props">
+                  {{ formatCurrency(props.value) }}
+                </q-td>
+              </template>
 
               <template v-slot:body-cell-valor_total="props">
                 <q-td :props="props">
@@ -347,7 +374,7 @@
                     dense
                     round
                     flat
-                    @click="editarPedido(props.row)"
+                    @click="abrirEdicao(props.row)"
                   />
                   <q-btn
                     icon="delete"
@@ -362,14 +389,94 @@
             </q-table>
           </q-tab-panel>
 
-          <q-tab-panel name="fechamentos" class="q-pa-none">
+          <q-tab-panel name="fechamentosAtivos" class="q-pa-none">
             <div class="row q-col-gutter-md">
-              <div v-for="f in rowsFechamentos" :key="f.id" class="col-12">
+              <div v-for="f in fechamentosPendentes" :key="f.id" class="col-12">
                 <q-card flat bordered class="my-card shadow-1">
                   <q-expansion-item
                     expand-separator
                     icon="receipt_long"
-                    :label="f.client?.nome || 'Cliente não identificado'"
+                    :label="formatLabel(f)"
+                    :caption="`Data: ${formatDate(f.createdAt)} | Total: ${formatCurrency(f.total)}`"
+                    header-class="text-primary text-weight-bold"
+                  >
+                    <q-card-section>
+                      <div class="text-weight-bold text-subtitle2">
+                        Resumo do Fechamento:
+                      </div>
+                      <div class="text-caption text-grey-7 q-mb-md">
+                        {{ f.descricao }}
+                      </div>
+
+                      <q-markup-table dense flat bordered>
+                        <thead class="bg-grey-2">
+                          <tr>
+                            <th class="text-left">Produto</th>
+                            <th class="text-center">Qtd Pedidos</th>
+                            <th class="text-right">Metragem Total</th>
+                            <th class="text-right">Valor Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr
+                            v-for="resumo in gerarResumoProdutos(f.pedidos)"
+                            :key="resumo.nome"
+                          >
+                            <td class="text-left">{{ resumo.nome }}</td>
+                            <td class="text-center">{{ resumo.qtd }}</td>
+                            <td class="text-right">
+                              {{ resumo.metragem.toFixed(2) }} m³
+                            </td>
+                            <td class="text-right">
+                              {{ formatCurrency(resumo.valor) }}
+                            </td>
+                          </tr>
+                        </tbody>
+                        <tfoot class="text-weight-bold bg-blue-1">
+                          <tr>
+                            <td class="text-left">TOTAL GERAL</td>
+                            <td class="text-center">
+                              {{ f.pedidos.length }}
+                            </td>
+                            <td class="text-right">
+                              {{
+                                f.pedidos
+                                  .reduce((s, p) => s + Number(p.metragem), 0)
+                                  .toFixed(2)
+                              }}
+                              m³
+                            </td>
+                            <td class="text-right">
+                              {{ formatCurrency(f.total) }}
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </q-markup-table>
+
+                      <div class="row justify-end q-mt-md q-gutter-sm">
+                        <q-btn
+                          flat
+                          color="primary"
+                          label="Ver Detalhes"
+                          icon="visibility"
+                          @click="verDetalhes(f)"
+                        />
+                      </div>
+                    </q-card-section>
+                  </q-expansion-item>
+                </q-card>
+              </div>
+            </div>
+          </q-tab-panel>
+
+          <q-tab-panel name="fechamentosPagos" class="q-pa-none">
+            <div class="row q-col-gutter-md">
+              <div v-for="f in fechamentosPagos" :key="f.id" class="col-12">
+                <q-card flat bordered class="my-card shadow-1">
+                  <q-expansion-item
+                    expand-separator
+                    icon="receipt_long"
+                    :label="formatLabel(f)"
                     :caption="`Data: ${formatDate(f.createdAt)} | Total: ${formatCurrency(f.total)}`"
                     header-class="text-primary text-weight-bold"
                   >
@@ -444,6 +551,151 @@
         </q-tab-panels>
       </div>
     </div>
+
+    <!-- MODAL EDIÇÃO PEDIDO -->
+    <q-dialog v-model="modalEdicaoPedido" persistent>
+      <q-card
+        style="min-width: 400px; max-width: 600px; border-radius: 12px shadow-5"
+      >
+        <q-card-section class="row items-center q-py-md bg-primary text-white">
+          <q-icon name="edit_note" size="sm" class="q-mr-sm" />
+          <div class="text-h6 text-weight-bold">
+            Editar Pedido #{{ pedidoEdicao.id }}
+          </div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup color="white" />
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-section class="q-pt-lg">
+          <q-form @submit="salvarAlteracoesPedido" class="q-gutter-y-sm">
+            <div class="row q-col-gutter-md">
+              <div class="col-12">
+                <q-select
+                  v-model="pedidoEdicao.veiculoId"
+                  :options="veiculosDoCliente"
+                  option-value="id"
+                  option-label="placa"
+                  label="Veículo / Placa"
+                  filled
+                  map-options
+                  emit-value
+                >
+                  <template v-slot:prepend>
+                    <q-icon name="local_shipping" color="blue" />
+                  </template>
+                  <template v-slot:option="scope">
+                    <q-item v-bind="scope.itemProps">
+                      <q-item-section>
+                        <q-item-label>{{ scope.opt.placa }}</q-item-label>
+                        <q-item-label caption>{{
+                          scope.opt.modelo
+                        }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+              </div>
+              <div class="col-12">
+                <q-select
+                  v-model="pedidoEdicao.produtoId"
+                  :options="listaProdutos"
+                  option-value="id"
+                  option-label="nome"
+                  label="Produto Selecionado"
+                  map-options
+                  emit-value
+                  filled
+                  bg-color="blue-1"
+                  stack-label
+                  icon="inventory_2"
+                >
+                  <template v-slot:prepend>
+                    <q-icon name="shopping_cart" color="blue" />
+                  </template>
+                </q-select>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <q-input
+                  v-model="pedidoEdicao.metragem"
+                  type="number"
+                  label="Metragem"
+                  filled
+                  stack-label
+                >
+                  <template v-slot:prepend>
+                    <q-icon name="straighten" />
+                  </template>
+                </q-input>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <q-select
+                  v-model="pedidoEdicao.status"
+                  :options="optionsStatus"
+                  map-options
+                  emit-value
+                  label="Status Atual"
+                  filled
+                  stack-label
+                >
+                  <template v-slot:prepend>
+                    <q-icon name="info" />
+                  </template>
+                </q-select>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <q-input
+                  v-model="pedidoEdicao.produto_valor"
+                  label="Valor Unitário"
+                  prefix="R$"
+                  filled
+                />
+              </div>
+
+              <div class="col-12 col-md-6">
+                <q-input
+                  v-model="pedidoEdicao.valor_total"
+                  label="Valor Total"
+                  prefix="R$"
+                  filled
+                  bg-color="green-1"
+                  color="green-10"
+                  readonly
+                  label-color="green-10"
+                >
+                  <template v-slot:prepend>
+                    <q-icon name="payments" color="green" />
+                  </template>
+                </q-input>
+              </div>
+            </div>
+
+            <div class="row justify-end q-mt-xl q-gutter-sm">
+              <q-btn
+                label="Cancelar"
+                color="grey-7"
+                flat
+                v-close-popup
+                class="q-px-md"
+              />
+              <q-btn
+                :loading="loading"
+                label="Salvar Alterações"
+                color="secondary"
+                type="submit"
+                unelevated
+                icon="save"
+                class="q-px-lg"
+              />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
 
     <!-- MODAL DETALHES DO FECHAMENTO -->
     <q-dialog
@@ -534,10 +786,45 @@
             color="secondary"
             icon="picture_as_pdf"
             label="Exportar para PDF"
-            @click="gerarPDF(fechamentoSelecionado)"
+            @click="visualizarPDF(fechamentoSelecionado)"
           />
-          <q-btn color="green" label="Finalizar" icon="check_circle" />
+          <q-btn
+            v-if="fechamentoSelecionado?.status === 'PENDENTE'"
+            color="green"
+            label="Finalizar"
+            icon="check_circle"
+            @click="finalizarFechamento(fechamentoSelecionado)"
+          />
         </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <!-- MODAL PREVIEW PDF -->
+    <q-dialog
+      v-model="showPDFPreview"
+      maximized
+      transition-show="fade"
+      transition-hide="fade"
+    >
+      <q-card class="bg-dark">
+        <q-bar class="bg-primary text-white q-pa-md" style="height: 60px">
+          <q-icon name="description" color="secondary" size="md" />
+          <div class="text-h6 text-weight-bolder">PREVIEW DO FECHAMENTO</div>
+          <q-space />
+          <q-btn flat round icon="download" @click="baixarPDF" color="white">
+            <q-tooltip>Baixar Arquivo</q-tooltip>
+          </q-btn>
+          <q-btn flat round icon="close" v-close-popup color="white" />
+        </q-bar>
+
+        <q-card-section class="q-pa-none" style="height: calc(100vh - 60px)">
+          <iframe
+            :src="pdfUrl"
+            width="100%"
+            height="100%"
+            frameborder="0"
+          ></iframe>
+        </q-card-section>
       </q-card>
     </q-dialog>
   </q-page>
@@ -547,13 +834,24 @@
 import { ref, computed, onMounted, watch } from "vue";
 import { api } from "src/boot/axios";
 import { useQuasar, date } from "quasar";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const $q = useQuasar();
 const carregandoPedidos = ref(false);
-const tab = ref("pedidos"); // Controla qual visão está ativa
+const tab = ref("pedidos");
+const loading = ref(false);
 
 const rowsPedidos = ref([]);
 const rowsFechamentos = ref([]);
+
+const modalEdicaoPedido = ref(false);
+const pedidoEdicao = ref({});
+const listaProdutos = ref([]);
+const listaVeiculos = ref([]);
+const showPDFPreview = ref(false);
+const pdfUrl = ref("");
+const fechamentoAtualParaDownload = ref(null);
 
 const modalDetalhesFechamento = ref(false);
 const fechamentoSelecionado = ref(null);
@@ -617,6 +915,12 @@ const columnsPedidos = [
     field: "metragem",
   },
   {
+    name: "produto_valor",
+    align: "center",
+    label: "Valor Unit.",
+    field: (row) => row.produto_valor,
+  },
+  {
     name: "valor_total",
     align: "right",
     label: "Total",
@@ -657,7 +961,7 @@ const colunasDetalhes = [
   },
   {
     name: "valor",
-    label: "Valor Unit.",
+    label: "Valor Carga",
     field: "valor_total",
     format: (val) => formatCurrency(val),
     align: "right",
@@ -700,7 +1004,6 @@ const gerarFechamento = () => {
     (p) =>
       p.fechamentoId || p.status === "EM_FECHAMENTO" || p.status === "PAGO",
   );
-  console.log(pedidosBloqueados);
 
   if (pedidosBloqueados.length > 0) {
     $q.notify({
@@ -790,7 +1093,6 @@ async function carregarDados() {
     ]);
     rowsPedidos.value = resPedidos.data;
     rowsFechamentos.value = resFechamentos.data;
-    console.log(rowsPedidos);
   } catch (err) {
     console.error("Erro ao carregar relatórios", err);
   } finally {
@@ -803,23 +1105,40 @@ const pagination = ref({
   rowsPerPage: 20,
 });
 
-async function mudarStatus(id, novoStatus) {
+const carregarDadosIniciais = async () => {
   try {
-    await api.put(`/pedidos/${id}`, { status: novoStatus });
-    $q.notify({
-      color: "positive",
-      message: `Status do pedido ${id} atualizado!`,
-    });
+    // Busca produtos e veículos em paralelo
+    const [resProd, resVeic] = await Promise.all([
+      api.get("/produtos"),
+      api.get("/veiculos"),
+    ]);
+    listaProdutos.value = resProd.data;
+    listaVeiculos.value = resVeic.data;
   } catch (error) {
-    $q.notify({ color: "negative", message: "Erro ao atualizar status" });
+    console.error("Erro ao carregar dados:", error);
   }
-}
+};
 
-// Abrir modal ou navegar para tela de edição
-function editarPedido(pedido) {
-  console.log("Editando pedido:", pedido);
-  // Aqui você pode abrir um q-dialog com o formulário
-}
+const abrirEdicao = (item) => {
+  // Fazemos um spread para não alterar a linha da tabela antes de salvar
+  pedidoEdicao.value = { ...item };
+  modalEdicaoPedido.value = true;
+};
+
+const salvarAlteracoesPedido = async () => {
+  loading.value = true;
+  console.log("Dados prontos para API:", pedidoEdicao.value);
+  try {
+    await api.put(`/pedidos/${pedidoEdicao.value.id}`, pedidoEdicao.value);
+    $q.notify({ color: "positive", message: "Pedido atualizado com sucesso!" });
+    carregarDados();
+    modalEdicaoPedido.value = false;
+  } catch (error) {
+    $q.notify({ color: "negative", message: "Erro ao atualizar pedido" });
+  } finally {
+    loading.value = false;
+  }
+};
 
 // Confirmar antes de deletar
 function confirmarExclusao(id) {
@@ -829,16 +1148,63 @@ function confirmarExclusao(id) {
       "Deseja realmente apagar este pedido? Esta ação não pode ser desfeita.",
     cancel: true,
     persistent: true,
+    icon: "warning",
   }).onOk(async () => {
     try {
       await api.delete(`/pedidos/${id}`);
       $q.notify({ color: "positive", message: "Pedido excluído com sucesso!" });
-      // Chame sua função carregarPedidos() aqui para atualizar a lista
+      carregarDados();
     } catch (error) {
       $q.notify({ color: "negative", message: "Erro ao excluir pedido" });
     }
   });
 }
+
+function finalizarFechamento(fechamento) {
+  const id = fechamento.id;
+  $q.dialog({
+    title: "Finalizar Fechamento",
+    message:
+      "Deseja realmente finalizar este fechamento? O status será alterado para PAGO.",
+    cancel: true,
+    persistent: true,
+    ok: { label: "Finalizar", color: "green" },
+    cancel: { label: "Voltar", color: "grey" },
+  }).onOk(async () => {
+    try {
+      // O segundo argumento do PUT é o corpo (body) da requisição
+      // Enviamos um objeto: { status: "PAGO" }
+      await api.put(`/fechamentos/${id}/finalizar`, { status: "PAGO" });
+
+      $q.notify({
+        color: "positive",
+        icon: "check",
+        message: "Fechamento e todos os pedidos foram marcados como PAGOS!",
+      });
+
+      carregarDados();
+      modalDetalhesFechamento.value = false;
+    } catch (error) {
+      $q.notify({
+        color: "negative",
+        message: "Erro ao finalizar fechamento",
+      });
+    }
+  });
+}
+
+const fechamentosPendentes = computed(() => {
+  return rowsFechamentos.value
+    .filter((f) => f.status === "PENDENTE")
+    .sort((a, b) => a.id - b.id); // Garante a ordem por ID no front
+});
+
+// Lista de Pagos ordenada por ID
+const fechamentosPagos = computed(() => {
+  return rowsFechamentos.value
+    .filter((f) => f.status === "PAGO")
+    .sort((a, b) => a.id - b.id);
+});
 
 /* Utilitários */
 function formatCurrency(v) {
@@ -855,6 +1221,169 @@ function formatDate(d) {
 // Função para usar no template
 const formatStatus = (status) => {
   return statusMap[status] || { label: status, color: "grey", icon: "help" };
+};
+
+function formatLabel(f) {
+  const nomeCliente = f.client?.nome || "Cliente não identificado";
+  return `${f.id} - ${nomeCliente}`;
+}
+
+const visualizarPDF = (fechamento) => {
+  const doc = new jsPDF();
+  fechamentoAtualParaDownload.value = fechamento;
+
+  const colors = {
+    primary: [26, 26, 26], // #1A1A1A
+    secondary: [242, 145, 0], // #F29100
+    accent: [46, 125, 50], // #2E7D32
+    subtext: [100, 100, 100],
+  };
+
+  // --- CABEÇALHO ---
+  doc.setFillColor(...colors.primary);
+  doc.rect(0, 0, 210, 35, "F");
+  doc.setFillColor(...colors.secondary);
+  doc.rect(0, 35, 210, 1.5, "F");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  doc.setTextColor(255, 255, 255);
+  doc.text("RELATÓRIO DE FECHAMENTO", 15, 22);
+
+  // --- INFO CLIENTE ---
+  doc.setTextColor(...colors.primary);
+  doc.setFontSize(10);
+  doc.text(`CLIENTE: ${fechamento.client?.nome || "N/A"}`, 15, 50);
+  doc.text(
+    `DATA DE EXPEDIÇÃO: ${new Date(fechamento.createdAt).toLocaleDateString()}`,
+    15,
+    55,
+  );
+  doc.setTextColor(...colors.subtext);
+  doc.setFontSize(8);
+  doc.text(`${fechamento.descricao || ''}`, 15, 60);
+
+
+
+
+  // --- TABELA DE PEDIDOS (COM VEÍCULO E VALOR M³) ---
+  autoTable(doc, {
+    startY: 65,
+    // Adicionamos as novas colunas no Header
+    head: [["DATA", "VEÍCULO", "PRODUTO", "VALOR M³", "METRAGEM", "TOTAL"]],
+    body: fechamento.pedidos.map((p) => [
+      new Date(p.createdAt).toLocaleDateString("pt-BR"),
+      p.veiculo?.placa || "SEM PLACA", // Tenta pegar a placa do campo direto ou da relação
+      p.produto?.nome || "-",
+      new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(p.produto_valor || 0),
+      `${Number(p.metragem).toFixed(2)} m³`,
+      new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(p.valor_total),
+    ]),
+    theme: "striped",
+    headStyles: { fillColor: colors.primary, halign: "center" },
+    styles: { fontSize: 8 },
+    // Definindo larguras para as colunas baterem com a tabela de resumo abaixo
+    columnStyles: {
+      0: { cellWidth: 25, halign: "center" }, // Data
+      1: { cellWidth: 25, halign: "center" }, // Veículo
+      2: { cellWidth: 50, halign: "center" }, // Produto (mais largo)
+      3: { cellWidth: 25, halign: "center" }, // Valor M³
+      4: { cellWidth: 25, halign: "center" }, // Metragem
+      5: { cellWidth: 32, halign: "center", fontStyle: "bold" }, // Total
+    },
+  });
+
+  // --- RESUMO POR PRODUTO ---
+  let finalY = doc.lastAutoTable.finalY + 10;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(...colors.primary);
+
+  doc.text("RESUMO POR CATEGORIA", 15, finalY);
+
+autoTable(doc, {
+  startY: finalY + 5,
+  head: [["PRODUTO", "QTD PEDIDOS", "M³ TOTAL", "SUBTOTAL"]],
+  body: gerarResumoProdutos(fechamento.pedidos).map((r) => [
+    r.nome.toUpperCase(),
+    r.qtd,
+    `${r.metragem.toFixed(2)} m³`,
+    new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(r.valor),
+  ]),
+  headStyles: { fillColor: [60, 60, 60], halign: 'center' },
+  styles: { fontSize: 8 },
+  columnStyles: {
+    // 1. Produto: Ocupa o espaço inicial (Data + Veículo + Produto da tabela de cima)
+    0: { cellWidth: 100, halign: 'center' },
+
+    // 2. Qtd Pedidos: Alinhado ao centro
+    1: { cellWidth: 25, halign: "center" },
+
+    // 3. M³ Total: Largura ajustada para não "vazar"
+    2: { cellWidth: 25, halign: "center" },
+
+    // 4. Subtotal: Espaço suficiente para o símbolo de R$ e o valor
+    3: {
+      cellWidth: 32,
+      halign: "center", // Financeiro sempre à direita
+      fontStyle: "bold",
+      textColor: colors.accent,
+    },
+  },
+});
+  // --- RODAPÉ COM TOTAL ---
+  const totalY = doc.lastAutoTable.finalY + 15;
+  autoTable(doc, {
+    startY: totalY,
+    margin: { left: 120 }, // Empurra o box para a direita
+    tableWidth: 76, // Largura fixa para o box
+    head: [["VALOR TOTAL LÍQUIDO"]],
+    body: [
+      [
+        new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        }).format(fechamento.total),
+      ],
+    ],
+    theme: "grid",
+    headStyles: {
+      fillColor: colors.primary,
+      halign: "center",
+      fontSize: 9,
+      cellPadding: 4,
+    },
+    bodyStyles: {
+      fillColor: colors.primary,
+      textColor: [255, 255, 255],
+      halign: "center",
+      fontSize: 16,
+      fontStyle: "bold",
+      cellPadding: 6,
+    },
+  });
+  // --- GERAÇÃO DO PREVIEW ---
+  if (pdfUrl.value) URL.revokeObjectURL(pdfUrl.value);
+  const blob = doc.output("blob");
+  pdfUrl.value = URL.createObjectURL(blob);
+  showPDFPreview.value = true;
+};
+
+// Função para baixar após o preview
+const baixarPDF = () => {
+  const link = document.createElement("a");
+  link.href = pdfUrl.value;
+  link.download = `Fechamento_${fechamentoAtualParaDownload.value?.id}.pdf`;
+  link.click();
 };
 
 watch(
@@ -973,7 +1502,50 @@ const resumoGeral = computed(() => {
   }, inicial);
 });
 
-onMounted(carregarDados);
+const veiculosDoCliente = computed(() => {
+  if (!pedidoEdicao.value.clientId) return [];
+
+  // Filtra a lista geral mantendo apenas os veículos cujo dono é o cliente do pedido
+  return listaVeiculos.value.filter(
+    (v) => v.clientId === pedidoEdicao.value.clientId,
+  );
+});
+
+watch(
+  () => pedidoEdicao.value.produtoId,
+  (novoId) => {
+    const produto = listaProdutos.value.find((p) => p.id === novoId);
+    if (produto) {
+      const valorBase = parseFloat(produto.valor_m3) || 0;
+      pedidoEdicao.value.produto_valor = valorBase.toFixed(2);
+    }
+  },
+);
+
+watch(
+  () => pedidoEdicao.value.veiculoId,
+  (novoVeiculoId) => {
+    // Procuramos o veículo dentro da lista filtrada
+    const veiculo = veiculosDoCliente.value.find((v) => v.id === novoVeiculoId);
+
+    if (veiculo) {
+      // A metragem do pedido passa a ser a metragem/capacidade do veículo selecionado
+      pedidoEdicao.value.metragem = veiculo.metragem;
+    }
+  },
+);
+
+watch(
+  [() => pedidoEdicao.value.metragem, () => pedidoEdicao.value.produto_valor],
+  ([novaMetragem, novoValorUnitario]) => {
+    const m = parseFloat(novaMetragem) || 0;
+    const v = parseFloat(novoValorUnitario) || 0;
+
+    pedidoEdicao.value.valor_total = (m * v).toFixed(2);
+  },
+);
+
+onMounted(carregarDados(), carregarDadosIniciais());
 </script>
 
 <style scoped>
