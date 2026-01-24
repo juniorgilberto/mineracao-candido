@@ -5,6 +5,7 @@ import { defineConfig } from "#q-app/wrappers";
 
 export default defineConfig((/* ctx */) => {
   return {
+    productName: 'Mineração Cândido',
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
 
@@ -64,6 +65,7 @@ export default defineConfig((/* ctx */) => {
       title: "Mineração Cândido",
       lang: "pt-BR",
     },
+
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#devserver
     devServer: {
@@ -156,8 +158,6 @@ export default defineConfig((/* ctx */) => {
       // extendInjectManifestOptions (cfg) {}
 
       manifest: {
-        id: "mineracao-candido",
-
         // Nome na tela de instalação
         name: "Mineração Cândido",
 
