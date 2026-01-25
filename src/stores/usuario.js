@@ -42,12 +42,10 @@ export const useUsuarioStore = defineStore("usuario", {
 
       // 3. Limpa TODOS os storages (disco)
       localStorage.removeItem("token");
-      localStorage.removeItem("user_nome");
-      localStorage.removeItem("user_role");
+      localStorage.removeItem("user_data");
 
       sessionStorage.removeItem("token");
-      sessionStorage.removeItem("user_nome");
-      sessionStorage.removeItem("user_role");
+      sessionStorage.removeItem("user_data");
     },
 
     // Importante: Função para carregar os dados ao abrir o app
