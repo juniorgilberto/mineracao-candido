@@ -48,9 +48,6 @@ export const useUsuarioStore = defineStore("usuario", {
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("user_nome");
       sessionStorage.removeItem("user_role");
-
-      // Opcional: Redirecionar para o login se não estiver num componente
-      // this.router.push('/login');
     },
 
     // Importante: Função para carregar os dados ao abrir o app

@@ -5,11 +5,8 @@ const routes = [
     path: "/",
     beforeEnter: (to, from, next) => {
       const usuarioStore = useUsuarioStore();
-      if (
-        usuarioStore.token == "" ||
-        usuarioStore.token == null ||
-        usuarioStore.token == undefined
-      ) {
+      usuarioStore.reidratarStore();
+      if (!usuarioStore.token) {
         next({ path: "/login" });
       } else {
         next();

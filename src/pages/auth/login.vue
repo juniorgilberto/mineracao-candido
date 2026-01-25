@@ -90,18 +90,12 @@ async function onSubmit() {
   try {
     const response = await api.post('/login', {
       usuario: form.value.usuario,
-      senha: form.value.senha
+      senha: form.value.senha,
+      lembrar: form.value.remember
     })
 
-    const data = response.data
-    const remember = form.value.remember
-
     // Chamamos a store passando a opção de "lembrar"
-    usuarioStore.setLogin({
-      nome: data.nome,
-      role: data.role,
-      token: data.token
-    }, remember);
+    usuarioStore.setLogin(resposta.data, remember.value);
 
     $q.notify({ type: 'positive', message: 'Login efetuado com sucesso' })
     router.push("/")
