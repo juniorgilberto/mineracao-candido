@@ -95,7 +95,7 @@ async function onSubmit() {
     })
 
     // Chamamos a store passando a opção de "lembrar"
-    usuarioStore.setLogin(response.data, remember.value);
+    usuarioStore.setLogin(response.data, form.value.remember);
 
     $q.notify({ type: 'positive', message: 'Login efetuado com sucesso' })
     router.push("/")
