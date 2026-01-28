@@ -1145,7 +1145,7 @@ function confirmarExclusao(id) {
   $q.dialog({
     title: "Confirmar Exclusão",
     message:
-      "Deseja realmente apagar este pedido? Esta ação não pode ser desfeita.",
+      `Deseja realmente apagar este pedido ${id}? Esta ação não pode ser desfeita.`,
     cancel: true,
     persistent: true,
     icon: "warning",
