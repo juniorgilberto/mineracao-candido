@@ -6,54 +6,81 @@
       :columns="columns"
       row-key="id"
       :grid="$q.screen.lt.md"
-      class="text-center q-ma-lg no-shadow"
+      class="no-shadow bg-transparent"
       @row-click="linhaCliente"
     >
       <template v-slot:top>
-        <div class="col-12 row items-center justify-between q-gutter-y-sm">
-          <div class="row items-center q-gutter-sm">
-            <q-icon name="people" size="sm" color="primary" />
-            <div class="text-h6 text-weight-medium">Clientes</div>
+        <div
+          class="full-width row items-center justify-between q-gutter-y-md q-pa-sm"
+        >
+          <div class="text-h5 text-weight-bold text-grey-9 row items-center">
+            <q-icon name="people" size="md" color="primary" class="q-mr-xs" />
+            Clientes
           </div>
 
-          <div class="row q-gutter-sm items-center full-width-mobile">
+          <div class="row items-center col-12 col-lg-4">
             <q-input
-              dense
-              debounce="300"
               v-model="filter"
               placeholder="Pesquisar..."
-              bg-color="white"
-              class="col q-mr-md"
+              class="col-12 col-lg-6 q-mr-md q-mb-md"
+              style="min-width: 250px"
             >
-              <template v-slot:append>
-                <q-icon name="search" />
-              </template>
+              <template v-slot:prepend><q-icon name="search" /></template>
             </q-input>
+
             <q-btn
               color="positive"
               icon="add"
               label="Novo Cliente"
               unelevated
               @click="onAdd"
+              class="col-12 col-lg-auto"
             />
           </div>
         </div>
       </template>
 
+      <template v-slot:body-cell-actions="props">
+        <q-td :props="props" class="q-gutter-x-sm">
+          <q-btn
+            flat
+            round
+            dense
+            color="primary"
+            icon="edit"
+            @click.stop="onEdit(props.row)"
+          />
+          <q-btn
+            flat
+            round
+            dense
+            color="negative"
+            icon="delete"
+            @click.stop="confirmDelete(props.row)"
+          />
+        </q-td>
+      </template>
+
       <template v-slot:item="props">
-        <div class="q-pa-xs col-xs-12 col-sm-6">
-          <q-card flat bordered class="q-py-sm">
-            <q-item clickable @click="linhaCliente(null, props.row)">
-              <q-item-section>
-                <q-item-label class="text-weight-bold">{{
+        <div class="col-12 q-pa-sm">
+          <q-card flat bordered class="rounded-borders bg-white">
+            <q-item class="q-pa-md">
+              <q-item-section
+                @click="linhaCliente(null, props.row)"
+                class="cursor-pointer"
+              >
+                <q-item-label class="text-weight-bold text-body1">{{
                   props.row.nome
                 }}</q-item-label>
+                <q-item-label caption class="q-mt-xs">{{
+                  props.row.email
+                }}</q-item-label>
+                <q-item-label caption>{{ props.row.telefone }}</q-item-label>
               </q-item-section>
 
               <q-item-section side>
-                <div class="row q-gutter-xs">
+                <div class="row no-wrap">
                   <q-btn
-                    size="sm"
                     flat
                     round
                     color="primary"
@@ -61,7 +88,6 @@
                     @click.stop="onEdit(props.row)"
                   />
                   <q-btn
-                    size="sm"
                     flat
                     round
                     color="negative"
@@ -72,32 +98,6 @@
               </q-item-section>
             </q-item>
           </q-card>
-        </div>
-      </template>
-
-      <template v-slot:body-cell-actions="props">
-        <q-td align="center">
-          <q-btn
-            dense
-            flat
-            icon="edit"
-            color="primary"
-            @click.stop="onEdit(props.row)"
-          />
-          <q-btn
-            dense
-            flat
-            icon="delete"
-            color="negative"
-            @click.stop="confirmDelete(props.row)"
-          />
-        </q-td>
-      </template>
-
-      <template v-slot:no-data>
-        <div class="full-width row flex-center text-grey-8 q-gutter-sm q-pa-lg">
-          <q-icon size="2em" name="sentiment_dissatisfied" />
-          <span>Nenhum cliente encontrado.</span>
         </div>
       </template>
     </q-table>
@@ -126,7 +126,7 @@
 
     <!-- MODAL CADASTRAR/EDITAR CLIENTE -->
     <q-dialog v-model="dialogCliente" persistent>
-      <q-card style="width: 550px; max-width: 90vw; border-radius: 12px">
+      <q-card style="width: 550px; max-width: 90vw; border-width: 0">
         <q-card-section class="bg-primary text-white row items-center">
           <div class="text-h6">
             <q-icon name="person_add" class="q-mr-sm" />
@@ -158,73 +158,84 @@
 
             <q-separator q-my-md />
 
-            <q-input
-              v-model="form.nome"
-              label="Nome Completo / Fantasia *"
-              outlined
-              dense
-              :rules="[(val) => !!val || 'Campo obrigatório']"
-            />
-
-            <template v-if="form.type === 'PESSOA_FISICA'">
+            <div class="q-gutter-y-md">
               <q-input
-                v-model="form.cpf"
-                label="CPF"
+                v-model="form.nome"
+                label="Nome Completo / Fantasia *"
                 outlined
                 dense
-                mask="###.###.###-##"
+                :rules="[(val) => !!val || 'Campo obrigatório']"
+                hide-bottom-space
+              />
+
+              <div v-if="form.type === 'PESSOA_FISICA'" class="q-gutter-y-md">
+                <q-input
+                  v-model="form.cpf"
+                  label="CPF"
+                  outlined
+                  dense
+                  mask="###.###.###-##"
+                  unmasked-value
+                  :rules="[validarCPF]"
+                  hide-bottom-space
+                />
+              </div>
+
+              <div v-else class="q-gutter-y-md">
+                <q-input
+                  v-model="form.cnpj"
+                  label="CNPJ"
+                  outlined
+                  dense
+                  mask="##.###.###/####-##"
+                  unmasked-value
+                  :rules="[validarCNPJ]"
+                  hide-bottom-space
+                />
+                <q-input
+                  v-model="form.razaoSocial"
+                  label="Razão Social"
+                  outlined
+                  dense
+                  hide-bottom-space
+                />
+                <q-input
+                  v-model="form.inscricaoEstadual"
+                  label="Inscrição Estadual"
+                  outlined
+                  dense
+                  hide-bottom-space
+                />
+              </div>
+
+              <q-input
+                v-model="form.telefone"
+                label="Telefone"
+                outlined
+                dense
+                mask="(##) #####-####"
                 unmasked-value
-                :rules="[validarCPF]"
+                hide-bottom-space
               />
-            </template>
 
-            <template v-else>
               <q-input
-                v-model="form.cnpj"
-                label="CNPJ"
+                v-model="form.email"
+                label="E-mail"
                 outlined
                 dense
-                mask="##.###.###/####-##"
-                unmasked-value
-                :rules="[validarCNPJ]"
+                type="email"
+                hide-bottom-space
               />
+
               <q-input
-                v-model="form.razaoSocial"
-                label="Razão Social"
+                v-model="form.endereco"
+                label="Endereço Completo"
                 outlined
                 dense
+                autogrow
+                hide-bottom-space
               />
-              <q-input
-                v-model="form.inscricaoEstadual"
-                label="Inscrição Estadual"
-                outlined
-                dense
-              />
-            </template>
-
-            <q-input
-              v-model="form.telefone"
-              label="Telefone"
-              outlined
-              dense
-              mask="(##) #####-####"
-              unmasked-value
-            />
-            <q-input
-              v-model="form.email"
-              label="E-mail"
-              outlined
-              dense
-              type="email"
-            />
-
-            <q-input
-              v-model="form.endereco"
-              label="Endereço Completo"
-              outlined
-              dense
-              autogrow
-            />
+            </div>
           </q-card-section>
 
           <q-card-actions align="right" class="q-pb-md q-pr-md">
@@ -634,13 +645,25 @@ const columns = [
   { name: "telefone", label: "Telefone", field: "telefone" },
   { name: "actions", label: "Ações", field: "actions", align: "center" },
 ];
+const pagination = ref({
+  rowsPerPage: 20,
+});
 
 const filtered = computed(() => {
-  const q = filter.value && filter.value.toLowerCase().trim();
+  const q = filter.value?.toLowerCase().trim();
+
   if (!q) return clients.value;
-  return clients.value.filter((c) =>
-    (c.name + " " + c.email + " " + c.telefone).toLowerCase().includes(q),
-  );
+
+  return clients.value.filter((c) => {
+    // Captura os valores tratando nulos para evitar erros
+    const n = (c.nome || "").toLowerCase();
+    const e = (c.email || "").toLowerCase();
+    const t = (c.telefone || "").toLowerCase();
+
+    const match = n.includes(q) || e.includes(q) || t.includes(q);
+
+    return match;
+  });
 });
 
 const validarCPF = (val) => {
@@ -1009,3 +1032,18 @@ onMounted(() => {
   // carregar dados da API aqui, se necessário
 });
 </script>
+<style scoped>
+/* Garante coluna única no mobile/tablet */
+.q-table__grid-content {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* No desktop, mantém o visual de tabela clássica */
+@media (min-width: 1024px) {
+  .q-table {
+    background-color: white !important;
+    border-radius: 8px;
+  }
+}
+</style>

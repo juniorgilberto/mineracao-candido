@@ -43,6 +43,7 @@ export const useUsuarioStore = defineStore("usuario", {
       // 3. Limpa TODOS os storages (disco)
       localStorage.removeItem("token");
       localStorage.removeItem("user_data");
+      localStorage.removeItem("filtroProduto");
 
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("user_data");

@@ -1,30 +1,52 @@
 <template>
   <q-page padding>
-    <q-toolbar class="row q-col-gutter-md justify-around">
-      <q-input
-        v-model="filtro"
-        dense
-        placeholder="Pesquisar (cliente / placa / material...)"
-        debounce="300"
-        class="q-mr-sm col-md-6"
-        style="max-width: 360px"
-      >
-        <template v-slot:append>
-          <q-icon name="search" />
-        </template>
-      </q-input>
-      <div class="row col-md-6 justify-end items-center">
-        <div class="text-subtitle1 text-grey q-mr-md">
-          Hoje: {{ new Date().toLocaleDateString("pt-BR") }}
+    <q-toolbar class="q-py-md q-px-lg">
+      <div class="row full-width items-center q-col-gutter-sm">
+        <div class="col-12 col-md-7 row q-gutter-md items-center">
+          <q-input
+            v-model="filtro"
+            placeholder="Cliente ou Placa..."
+            debounce="300"
+            class="col-12 col-sm-grow"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+
+          <q-select
+            v-model="filtroStore.produtoSelecionado"
+            :options="filtroStore.listaProdutos"
+            label="Material"
+            emit-value
+            map-options
+            class="col-12 col-sm-auto"
+            style="min-width: 180px"
+            @update:model-value="filtroStore.setProduto"
+          />
         </div>
-        <q-btn
-          label="+ Nova Venda"
-          color="positive"
-          @click="cardVenda = true"
-        />
+
+        <div
+          class="col-12 col-md-5 row items-center justify-between justify-md-end q-gutter-md"
+        >
+          <div class="text-subtitle2 text-grey-7">
+            <q-icon name="event" size="xs" class="q-mr-xs" />
+            {{ new Date().toLocaleDateString("pt-BR") }}
+          </div>
+
+          <q-btn
+            label="Nova Venda"
+            color="positive"
+            unelevated
+            icon="add"
+            @click="cardVenda = true"
+            class="col-grow col-md-auto"
+          />
+        </div>
       </div>
     </q-toolbar>
 
+    <!-- MODAL NOVA VENDA  -->
     <q-dialog
       v-model="cardVenda"
       transition-show="scale"
@@ -176,63 +198,139 @@
       </q-card>
     </q-dialog>
 
-    <div v-if="!pedidos.length" class="text-center text-grey-7 q-mt-xl">
-      Nenhuma venda lançada no dia de hoje. Clique em <b>Nova Venda</b> para
-      cadastrar uma.
-    </div>
-    <div v-else class="row justify-center q-mt-md q-gutter-md">
+
+    <!-- CARDS DOS PEDIDOS  -->
+    <div
+      class="row justify-center q-mt-md q-gutter-md"
+      v-if="pedidosFiltrados.length > 0"
+    >
       <q-card
         v-for="cliente in pedidosFiltrados"
         :key="cliente.nome"
-        class="q-pa-md col-12 col-md-5 col-lg-3"
+        class="q-pa-xs col-12 col-md-5 col-lg-3 shadow-2"
         flat
         bordered
       >
-        <div class="text-h6 text-primary text-bold">
-          {{ cliente.nome }}
-        </div>
+        <q-item class="q-pb-sm">
+          <q-item-section>
+            <div class="text-h6 text-primary text-bold">{{ cliente.nome }}</div>
+            <div class="text-caption text-grey-8">
+              <q-icon name="local_shipping" size="14px" class="q-mr-xs" />
+              {{ Object.keys(cliente.detalhes).length }} caminhão(ões)
+            </div>
+          </q-item-section>
+        </q-item>
 
-        <div class="text-caption q-mb-sm">
-          {{ Object.keys(cliente.detalhes).length }} caminhão(ões)
-        </div>
-
-        <q-separator />
+        <q-separator q-mt-sm />
 
         <q-card-section
           v-for="(v, chave, index) in cliente.detalhes"
           :key="chave"
           class="q-pa-none"
         >
-          <q-separator v-if="index !== 0" />
+          <q-separator v-if="index !== 0" dashed />
 
-          <div class="row justify-between items-center q-pa-md">
-            <div>
-              <div class="text-bold">{{ v.placa }}</div>
-              <div class="text-grey-7">
-                {{ v.produto }} • {{ v.metragem }} m³
+          <div class="column q-pa-md">
+            <div class="row justify-between items-center q-mb-xs">
+              <div
+                class="text-subtitle1 text-bold text-grey-9 bg-grey-3 q-px-sm rounded-borders"
+              >
+                {{ v.placa }}
               </div>
-              <div class="text-grey-7">
-                Carga: R$ {{ (v.metragem * v.produtoValor).toFixed(2) }}
-              </div>
+              <q-badge
+                outline
+                :color="obterCorProduto(v.produto)"
+                class="text-bold q-pa-xs"
+              >
+                {{ v.produto.toUpperCase() }}
+              </q-badge>
             </div>
 
-            <div class="row items-center">
-              <q-badge color="blue-2" text-color="primary" class="q-mr-md q-pa-sm" >
-                {{ v.viagens }} viagem(ns)
-              </q-badge>
-              <q-btn
-                size="md"
-                color="primary"
-                unelevated
-                label="+ VIAGEM"
-                @click="abrirModal(v, cliente)"
-              />
+            <div class="row justify-between items-end q-mt-sm">
+              <div class="col">
+                <div class="row items-center text-subtitle2 color-primary">
+                  <q-icon
+                    name="straighten"
+                    size="18px"
+                    class="q-mr-xs text-grey-6"
+                  />
+                  <span class="text-weight-bolder text-h6">{{
+                    v.metragem
+                  }}</span>
+                  <span class="q-ml-xs text-grey-7">m³</span>
+                </div>
+                <div class="text-caption text-weight-medium text-positive">
+                  Carga: R$
+                  {{
+                    (v.metragem * v.produtoValor).toLocaleString("pt-BR", {
+                      minimumFractionDigits: 2,
+                    })
+                  }}
+                </div>
+              </div>
+
+              <div class="column items-end">
+                <div
+                  class="text-bold text-primary q-mb-xs"
+                  style="font-size: 0.75rem"
+                >
+                  {{ v.viagens }} VIAGEM(NS)
+                </div>
+                <q-btn
+                  size="sm"
+                  color="primary"
+                  unelevated
+                  icon="add"
+                  label="VIAGEM"
+                  @click="abrirModal(v, cliente)"
+                  class="full-width"
+                />
+              </div>
             </div>
           </div>
         </q-card-section>
       </q-card>
     </div>
 
+    <div
+      v-else-if="pedidos.length === 0"
+      class="column items-center justify-center q-pa-xl text-grey-7"
+    >
+      <q-icon name="event_busy" size="80px" color="grey-4" />
+      <div class="text-h6 q-mt-md">Nenhum pedido hoje</div>
+      <div class="text-caption">
+        Ainda não foram registradas vendas hoje.
+      </div>
+
+      <q-btn
+        label="Iniciar Primeira Venda"
+        color="positive"
+        unelevated
+        icon="add"
+        class="q-mt-lg"
+        @click="cardVenda = true"
+      />
+    </div>
+
+    <div v-else class="column items-center justify-center q-pa-xl text-grey-7">
+      <q-icon name="search_off" size="80px" color="grey-4" />
+      <div class="text-h6 q-mt-md">Não encontramos resultados</div>
+      <div class="text-caption">
+        Tente ajustar os filtros ou o termo de busca.
+      </div>
+
+      <q-btn
+        flat
+        color="primary"
+        label="Limpar Filtros"
+        class="q-mt-md"
+        @click="limparFiltros"
+      />
+    </div>
+
+
+
+    <!-- MODAL CONFIMAR VIAGEM  -->
     <q-dialog
       v-model="modalConfirmacao"
       transition-show="scale"
@@ -264,6 +362,15 @@
                 <q-item-label caption>Veículo / Placa</q-item-label>
                 <q-item-label class="text-weight-bold">
                   {{ pedidoSelecionado?.detalhes.placa || "SEM PLACA" }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-item>
+              <q-item-section>
+                <q-item-label caption>Produto</q-item-label>
+                <q-item-label class="text-weight-bold">
+                  {{ pedidoSelecionado?.detalhes.produto || "SEM PLACA" }}
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -331,6 +438,8 @@
 import { api } from "src/boot/axios";
 import { ref, watch, onMounted, computed, onUnmounted } from "vue";
 import { useQuasar } from "quasar";
+import { useFiltroStore } from "src/stores/filtro";
+
 const $q = useQuasar();
 const filtro = ref("");
 const clientes = ref([]);
@@ -340,6 +449,8 @@ const veiculoId = ref(null);
 const produtos = ref([]);
 const produtoId = ref(null);
 const pedidos = ref([]);
+const filtroStore = useFiltroStore();
+
 const metrosCubicos = ref(null);
 const valorProduto = ref(null);
 const formVendas = ref(null);
@@ -373,34 +484,42 @@ const filtrarClientes = (val, update) => {
 
 const pedidosFiltrados = computed(() => {
   const termo = filtro.value.toLowerCase().trim();
+  const prodFiltro = filtroStore.produtoSelecionado;
 
-  if (!termo) return pedidos.value;
+  // 1. Se tudo estiver vazio, retorna a lista original
+  if (!termo && prodFiltro === "Todos") return pedidos.value;
 
   return pedidos.value
     .map((cliente) => {
-      // 1. Filtramos as entradas do objeto "detalhes"
+      // 2. Filtramos os detalhes baseados NO PRODUTO e (se houver termo) NA PLACA
+      // Se o usuário digitou o nome do cliente, não queremos esconder os detalhes do produto selecionado
       const detalhesFiltrados = Object.fromEntries(
-        Object.entries(cliente.detalhes || {}).filter(([chave, detalhe]) => {
-          const placa = detalhe.placa?.toLowerCase() || "";
-          const produto = detalhe.produto?.toLowerCase() || "";
+        Object.entries(cliente.detalhes || {}).filter(([_, det]) => {
+          const produtoMatch =
+            prodFiltro === "Todos" || det.produto === prodFiltro;
 
-          return placa.includes(termo) || produto.includes(termo);
+          // Se o termo bater com o nome do cliente, mostramos todos os produtos dele (que batem com o prodFiltro)
+          const nomeClienteBate = cliente.nome.toLowerCase().includes(termo);
+
+          // Se o nome não bater, verificamos se o termo bate com a placa ou o próprio nome do produto
+          const termoBateNosDetalhes =
+            (det.placa?.toLowerCase() || "").includes(termo) ||
+            (det.produto?.toLowerCase() || "").includes(termo);
+
+          return produtoMatch && (nomeClienteBate || termoBateNosDetalhes);
         }),
       );
 
-      // 2. Verificamos se o nome do cliente bate com a busca
+      const temDetalhesFiltrados = Object.keys(detalhesFiltrados).length > 0;
       const nomeClienteBate = cliente.nome.toLowerCase().includes(termo);
 
-      // 3. Verificamos se restou algum detalhe após o filtro
-      const temDetalhesFiltrados = Object.keys(detalhesFiltrados).length > 0;
-
-      // Se o nome do cliente bater, retornamos ele com TODOS os detalhes
-      if (nomeClienteBate) {
+      // 3. Decisão de exibição do Card
+      // Se o nome do cliente bate e estamos em "Todos", mostra ele completo
+      if (nomeClienteBate && prodFiltro === "Todos") {
         return cliente;
       }
 
-      // Se o nome NÃO bater, mas ele tiver detalhes que batem (placa ou produto)
-      // retornamos o cliente apenas com os detalhes filtrados
+      // Se houver detalhes que passaram no filtro (Produto + Placa/Texto)
       if (temDetalhesFiltrados) {
         return {
           ...cliente,
@@ -410,8 +529,21 @@ const pedidosFiltrados = computed(() => {
 
       return null;
     })
-    .filter((c) => c !== null); // Remove os clientes que não bateram em nada
+    .filter((c) => c !== null);
 });
+
+const limparFiltros = () => {
+  filtro.value = "";
+  filtroStore.produtoSelecionado = "Todos";
+};
+
+const obterCorProduto = (produto) => {
+  const p = produto?.toLowerCase();
+  if (p === "cascalho") return "blue-7"; // Cor para Cascalho
+  if (p === "terra") return "secondary"; // Cor para Terra
+
+  return "secondary"; // Cor padrão para outros produtos
+};
 
 function abrirModal(detalhes, cliente) {
   if (!cliente || !detalhes) return;
@@ -420,8 +552,6 @@ function abrirModal(detalhes, cliente) {
     clientId: cliente.clienteId,
     detalhes: { ...detalhes },
   };
-  console.log(pedidoSelecionado.value);
-
   modalConfirmacao.value = true;
 }
 
@@ -466,13 +596,12 @@ async function carregarDadosIniciais() {
     // Executa ambas as chamadas simultaneamente (mais rápido)
     const [resClientes, resProdutos] = await Promise.all([
       api.get("/clients"),
-      api.get("/produtos")
+      api.get("/produtos"),
     ]);
 
     // Atribui os dados após o término de ambas
     clientes.value = resClientes.data;
     produtos.value = resProdutos.data;
-
   } catch (error) {
     console.error("Erro ao carregar dados iniciais:", error);
     // Aqui você poderia adicionar um aviso ao usuário (ex: $q.notify)
@@ -492,7 +621,6 @@ async function carregarVeiculos(clientId) {
     carregandoVeiculos.value = false;
   }
 }
-
 
 async function getPedidos() {
   const hoje = new Date().toISOString().slice(0, 10);
@@ -588,6 +716,7 @@ watch(produtoId, (id) => {
 });
 carregarDadosIniciais();
 onMounted(() => {
+  filtroStore.carregarProdutos();
   carregarPedidos();
 
   // Atualiza os dados a cada 30 segundos automaticamente
@@ -598,7 +727,6 @@ onUnmounted(() => {
   // Limpa o timer quando o usuário sai da página
   if (pollingTimer) clearInterval(pollingTimer);
 });
-
 </script>
 
 <style scoped>
