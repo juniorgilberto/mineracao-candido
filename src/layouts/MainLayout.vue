@@ -4,7 +4,7 @@
       <div class="layout-centralizado">
         <q-toolbar>
           <q-toolbar-title>
-            <div class="row items-center no-wrap">
+            <div class="row items-center no-wrap cursor-pointer" @click="$router.push('/')">
               <img src="icon-principal-preto.png" style="height: 40px; max-width: 150px;" class="q-mr-md">
               <div class="gt-xs">Mineração Cândido</div>
             </div>

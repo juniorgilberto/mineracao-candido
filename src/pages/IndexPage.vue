@@ -198,7 +198,6 @@
       </q-card>
     </q-dialog>
 
-
     <!-- CARDS DOS PEDIDOS  -->
     <div
       class="row justify-center q-mt-md q-gutter-md"
@@ -207,60 +206,46 @@
       <q-card
         v-for="cliente in pedidosFiltrados"
         :key="cliente.nome"
-        class="q-pa-xs col-12 col-md-5 col-lg-3 shadow-2"
+        class="col-12 col-md-5 col-lg-4 shadow-1"
         flat
         bordered
       >
-        <q-item class="q-pb-sm">
-          <q-item-section>
-            <div class="text-h6 text-primary text-bold">{{ cliente.nome }}</div>
-            <div class="text-caption text-grey-8">
-              <q-icon name="local_shipping" size="14px" class="q-mr-xs" />
-              {{ Object.keys(cliente.detalhes).length }} caminhão(ões)
-            </div>
-          </q-item-section>
-        </q-item>
-
-        <q-separator q-mt-sm />
-
-        <q-card-section
-          v-for="(v, chave, index) in cliente.detalhes"
-          :key="chave"
-          class="q-pa-none"
+        <div
+          class="bg-primary text-white q-pa-md row justify-between items-center"
         >
-          <q-separator v-if="index !== 0" dashed />
+          <div class="text-subtitle1 text-bold">{{ cliente.nome }}</div>
+          <div class="text-caption">
+            {{ Object.keys(cliente.detalhes).length }} caminhão(ões)
+          </div>
+        </div>
 
-          <div class="column q-pa-md">
-            <div class="row justify-between items-center q-mb-xs">
-              <div
-                class="text-subtitle1 text-bold text-grey-9 bg-grey-3 q-px-sm rounded-borders"
-              >
-                {{ v.placa }}
-              </div>
-              <q-badge
-                outline
-                :color="obterCorProduto(v.produto)"
-                class="text-bold q-pa-xs"
-              >
-                {{ v.produto.toUpperCase() }}
-              </q-badge>
-            </div>
-
-            <div class="row justify-between items-end q-mt-sm">
-              <div class="col">
-                <div class="row items-center text-subtitle2 color-primary">
-                  <q-icon
-                    name="straighten"
-                    size="18px"
-                    class="q-mr-xs text-grey-6"
-                  />
-                  <span class="text-weight-bolder text-h6">{{
-                    v.metragem
-                  }}</span>
-                  <span class="q-ml-xs text-grey-7">m³</span>
+        <q-card-section class="q-pa-none">
+          <div
+            v-for="(v, chave, index) in cliente.detalhes"
+            :key="chave"
+            class="q-pa-md border-bottom"
+          >
+            <div class="row items-center no-wrap q-gutter-md">
+              <div class="col-grow">
+                <div
+                  class="text-weight-bolder text-uppercase text-grey-9 q-mb-sm"
+                >
+                  <q-badge
+                    outline
+                    :color="obterCorProduto(v.produto)"
+                    class="text-bold q-pa-xs"
+                  >
+                    {{ v.produto.toUpperCase() }}
+                  </q-badge>
                 </div>
-                <div class="text-caption text-weight-medium text-positive">
-                  Carga: R$
+                <div
+                  class="text-caption text-primary text-bold"
+                  style="font-size: 1.1em"
+                >
+                  {{ v.placa }}
+                </div>
+                <div class="text-caption text-positive text-bold">
+                  Total: R$
                   {{
                     (v.metragem * v.produtoValor).toLocaleString("pt-BR", {
                       minimumFractionDigits: 2,
@@ -269,24 +254,46 @@
                 </div>
               </div>
 
-              <div class="column items-end">
+              <div
+                class="col-auto text-center q-px-md q-mr-md"
+                style="
+                  border-left: 1px solid #ddd;
+                  border-right: 1px solid #ddd;
+                "
+              >
+                <div class="text-h6 text-bold">{{ v.metragem }}</div>
+                <div class="text-caption" style="margin-top: -8px">m³</div>
+              </div>
+
+              <div class="col-auto row items-center no-wrap">
                 <div
-                  class="text-bold text-primary q-mb-xs"
-                  style="font-size: 0.75rem"
+                  @click="acessarViagens(v, cliente)"
+                  class="column items-center q-mr-sm"
                 >
-                  {{ v.viagens }} VIAGEM(NS)
+                  <span class="text-bold" style="font-size: 20px">{{
+                    v.viagens
+                  }}</span>
+                  <span class="text-grey-7" style="font-size: 9px uppercase"
+                    >Viagem(ns)</span
+                  >
                 </div>
                 <q-btn
-                  size="sm"
-                  color="primary"
                   unelevated
+                  color="primary"
                   icon="add"
-                  label="VIAGEM"
+                  :label="$q.screen.gt.xs ? 'Viagem' : ''"
+                  :round="$q.screen.lt.sm"
+                  size="md"
+                  class="q-ml-md"
                   @click="abrirModal(v, cliente)"
-                  class="full-width"
                 />
               </div>
             </div>
+
+            <q-separator
+              v-if="index !== Object.keys(cliente.detalhes).length - 1"
+              class="q-mt-sm"
+            />
           </div>
         </q-card-section>
       </q-card>
@@ -298,9 +305,7 @@
     >
       <q-icon name="event_busy" size="80px" color="grey-4" />
       <div class="text-h6 q-mt-md">Nenhum pedido hoje</div>
-      <div class="text-caption">
-        Ainda não foram registradas vendas hoje.
-      </div>
+      <div class="text-caption">Ainda não foram registradas vendas hoje.</div>
 
       <q-btn
         label="Iniciar Primeira Venda"
@@ -327,8 +332,6 @@
         @click="limparFiltros"
       />
     </div>
-
-
 
     <!-- MODAL CONFIMAR VIAGEM  -->
     <q-dialog
@@ -439,7 +442,9 @@ import { api } from "src/boot/axios";
 import { ref, watch, onMounted, computed, onUnmounted } from "vue";
 import { useQuasar } from "quasar";
 import { useFiltroStore } from "src/stores/filtro";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const $q = useQuasar();
 const filtro = ref("");
 const clientes = ref([]);
@@ -591,6 +596,20 @@ async function confirmarViagem() {
   }
 }
 
+const acessarViagens = (v, cliente) => {
+  const d = new Date();
+  const hoje = [
+    d.getFullYear(),
+    String(d.getMonth() + 1).padStart(2, "0"),
+    String(d.getDate()).padStart(2, "0"),
+  ].join("-");
+
+  // Agora o push levará o dia 01/02/2026 mesmo sendo 20:30h
+  router.push(
+    `/relatorios?searchCliente=${cliente.nome}&searchMetragem=${v.metragem}&searchPlaca=${v.placa}&searchProduto=${v.produto}&from=${hoje}&to=${hoje}`,
+  );
+};
+
 async function carregarDadosIniciais() {
   try {
     // Executa ambas as chamadas simultaneamente (mais rápido)
@@ -623,7 +642,16 @@ async function carregarVeiculos(clientId) {
 }
 
 async function getPedidos() {
-  const hoje = new Date().toISOString().slice(0, 10);
+  const d = new Date();
+  // Monta a string manualmente: YYYY-MM-DD
+  const hoje = [
+    d.getFullYear(),
+    String(d.getMonth() + 1).padStart(2, "0"),
+    String(d.getDate()).padStart(2, "0"),
+  ].join("-"); // Retorna exatamente "YYYY-MM-DD" no fuso local
+
+  // Agora use esse 'hoje' para carregar os dados
+  console.log(hoje);
 
   const { data } = await api.get("/pedidos/agrupados", {
     params: {

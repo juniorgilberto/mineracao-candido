@@ -77,11 +77,23 @@
                     outlined
                     clearable
                     bg-color="white"
-                    mask="AAA-XXXX"
-                    unmasked-value
                   >
                     <template v-slot:prepend
                       ><q-icon name="directions_car"
+                    /></template>
+                  </q-input>
+                </div>
+                <div class="col-12 col-sm-6 col-md-1">
+                  <q-input
+                    v-model="filtros.metragem"
+                    label="M³"
+                    dense
+                    outlined
+                    clearable
+                    bg-color="white"
+                  >
+                    <template v-slot:prepend
+                      ><q-icon name="straighten"
                     /></template>
                   </q-input>
                 </div>
@@ -117,7 +129,7 @@
 
                 <div class="col-12 col-md-2">
                   <q-input
-                    v-model="filtros.dataStr"
+                    v-model="dataStr"
                     label="Período"
                     dense
                     outlined
@@ -133,7 +145,7 @@
                           <q-date
                             v-model="filtros.periodo"
                             range
-                            mask="DD/MM/YYYY"
+                            mask="YYYY/MM/DD"
                           >
                             <div class="row items-center justify-end">
                               <q-btn
@@ -298,7 +310,7 @@
             <q-table
               :loading="carregandoPedidos"
               title="Relatório de Pedidos"
-              :rows="rowsFiltrados"
+              :rows="rowsPedidos"
               :columns="columnsPedidos"
               row-key="id"
               selection="multiple"
@@ -833,9 +845,13 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { api } from "src/boot/axios";
-import { useQuasar, date } from "quasar";
+import { useQuasar, date, debounce } from "quasar";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { useRouter, useRoute } from "vue-router";
+
+const route = useRoute();
+const router = useRouter();
 
 const $q = useQuasar();
 const carregandoPedidos = ref(false);
@@ -865,10 +881,10 @@ const statusMap = {
 const filtros = ref({
   cliente: "",
   placa: "",
+  metragem: null,
   produto: null,
   status: null,
   periodo: null,
-  dataStr: "",
 });
 const optionsStatus = [
   { label: "Pendente", value: "PENDENTE" },
@@ -1083,14 +1099,47 @@ const gerarFechamento = () => {
   });
 };
 
+const sincronizarFiltrosPelaUrl = () => {
+  const q = route.query;
+
+  filtros.value.cliente = q.searchCliente || "";
+  filtros.value.placa = q.searchPlaca || "";
+  filtros.value.metragem = q.searchMetragem || "";
+  filtros.value.status = q.searchStatus || null;
+  filtros.value.produto = q.searchProduto || null;
+
+  // O Quasar QDate precisa de barras (/) para o range funcionar bem
+  if (q.from && q.to) {
+    const f = q.from.replaceAll("-", "/");
+    const t = q.to.replaceAll("-", "/");
+    filtros.value.periodo = f === t ? f : { from: f, to: t };
+  } else {
+    filtros.value.periodo = null;
+  }
+};
+
+// 2. BUSCA (Lê direto da URL para garantir que o que o usuário vê é o que o banco busca)
 async function carregarDados() {
   carregandoPedidos.value = true;
-  // Carrega ambos ou conforme a aba ativa para economizar processamento
   try {
+    const params = {
+      searchCliente: route.query.searchCliente || undefined,
+      searchPlaca: route.query.searchPlaca || undefined,
+      searchProduto: route.query.searchProduto || undefined,
+      searchStatus: route.query.searchStatus || undefined,
+      searchMetragem: route.query.searchMetragem || undefined,
+      from: route.query.from || undefined,
+      to: route.query.to || undefined,
+    };
+
+    console.log(params);
+
+
     const [resPedidos, resFechamentos] = await Promise.all([
-      api.get("/pedidos"),
-      api.get("/fechamentos"), // Filtro de ativos se houver no seu backend
+      api.get("/pedidos", { params }),
+      api.get("/fechamentos"),
     ]);
+
     rowsPedidos.value = resPedidos.data;
     rowsFechamentos.value = resFechamentos.data;
   } catch (err) {
@@ -1099,11 +1148,15 @@ async function carregarDados() {
     carregandoPedidos.value = false;
   }
 }
+
+
 const pagination = ref({
   sortBy: "data", // Nome da coluna definida em 'name'
   descending: true, // 'true' para o mais recente primeiro
   rowsPerPage: 20,
 });
+
+
 
 const carregarDadosIniciais = async () => {
   try {
@@ -1144,8 +1197,7 @@ const salvarAlteracoesPedido = async () => {
 function confirmarExclusao(id) {
   $q.dialog({
     title: "Confirmar Exclusão",
-    message:
-      `Deseja realmente apagar este pedido ${id}? Esta ação não pode ser desfeita.`,
+    message: `Deseja realmente apagar este pedido ${id}? Esta ação não pode ser desfeita.`,
     cancel: true,
     persistent: true,
     icon: "warning",
@@ -1261,10 +1313,7 @@ const visualizarPDF = (fechamento) => {
   );
   doc.setTextColor(...colors.subtext);
   doc.setFontSize(8);
-  doc.text(`${fechamento.descricao || ''}`, 15, 60);
-
-
-
+  doc.text(`${fechamento.descricao || ""}`, 15, 60);
 
   // --- TABELA DE PEDIDOS (COM VEÍCULO E VALOR M³) ---
   autoTable(doc, {
@@ -1307,39 +1356,39 @@ const visualizarPDF = (fechamento) => {
 
   doc.text("RESUMO POR CATEGORIA", 15, finalY);
 
-autoTable(doc, {
-  startY: finalY + 5,
-  head: [["PRODUTO", "QTD PEDIDOS", "M³ TOTAL", "SUBTOTAL"]],
-  body: gerarResumoProdutos(fechamento.pedidos).map((r) => [
-    r.nome.toUpperCase(),
-    r.qtd,
-    `${r.metragem.toFixed(2)} m³`,
-    new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(r.valor),
-  ]),
-  headStyles: { fillColor: [60, 60, 60], halign: 'center' },
-  styles: { fontSize: 8 },
-  columnStyles: {
-    // 1. Produto: Ocupa o espaço inicial (Data + Veículo + Produto da tabela de cima)
-    0: { cellWidth: 100, halign: 'center' },
+  autoTable(doc, {
+    startY: finalY + 5,
+    head: [["PRODUTO", "QTD PEDIDOS", "M³ TOTAL", "SUBTOTAL"]],
+    body: gerarResumoProdutos(fechamento.pedidos).map((r) => [
+      r.nome.toUpperCase(),
+      r.qtd,
+      `${r.metragem.toFixed(2)} m³`,
+      new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(r.valor),
+    ]),
+    headStyles: { fillColor: [60, 60, 60], halign: "center" },
+    styles: { fontSize: 8 },
+    columnStyles: {
+      // 1. Produto: Ocupa o espaço inicial (Data + Veículo + Produto da tabela de cima)
+      0: { cellWidth: 100, halign: "center" },
 
-    // 2. Qtd Pedidos: Alinhado ao centro
-    1: { cellWidth: 25, halign: "center" },
+      // 2. Qtd Pedidos: Alinhado ao centro
+      1: { cellWidth: 25, halign: "center" },
 
-    // 3. M³ Total: Largura ajustada para não "vazar"
-    2: { cellWidth: 25, halign: "center" },
+      // 3. M³ Total: Largura ajustada para não "vazar"
+      2: { cellWidth: 25, halign: "center" },
 
-    // 4. Subtotal: Espaço suficiente para o símbolo de R$ e o valor
-    3: {
-      cellWidth: 32,
-      halign: "center", // Financeiro sempre à direita
-      fontStyle: "bold",
-      textColor: colors.accent,
+      // 4. Subtotal: Espaço suficiente para o símbolo de R$ e o valor
+      3: {
+        cellWidth: 32,
+        halign: "center", // Financeiro sempre à direita
+        fontStyle: "bold",
+        textColor: colors.accent,
+      },
     },
-  },
-});
+  });
   // --- RODAPÉ COM TOTAL ---
   const totalY = doc.lastAutoTable.finalY + 15;
   autoTable(doc, {
@@ -1386,85 +1435,76 @@ const baixarPDF = () => {
   link.click();
 };
 
-watch(
-  () => filtros.value.periodo,
-  (val) => {
-    if (val && typeof val === "object") {
-      filtros.value.dataStr = `${val.from} até ${val.to}`;
-    } else if (typeof val === "string") {
-      filtros.value.dataStr = val;
-    } else {
-      filtros.value.dataStr = "";
-    }
-  },
-);
+const dataStr = computed(() => {
+  if (!filtros.value.periodo) return "";
 
-const rowsFiltrados = computed(() => {
-  return rowsPedidos.value.filter((row) => {
-    // --- Lógica da Placa ---
-    const buscaPlaca = filtros.value.placa?.toLowerCase() || "";
+  // O Quasar pode devolver string "2026/02/01" ou objeto {from, to}
+  const f = filtros.value.periodo.from || filtros.value.periodo;
+  const t = filtros.value.periodo.to || filtros.value.periodo;
 
-    // Pegamos a placa real ou definimos como "sem placa" para a comparação
-    const placaEfetiva = row.veiculo?.placa
-      ? row.veiculo.placa.toLowerCase()
-      : "sem placa";
+  const formatar = (d) => {
+    if (typeof d !== 'string') return "";
+    return d.split("/").reverse().join("/"); // Transforma 2026/02/01 em 01/02/2026
+  };
 
-    // Removemos caracteres especiais da busca e da placa real para busca flexível
-    const placaLimpa = placaEfetiva.replace(/[^a-z0-9]/g, "");
-    const buscaLimpa = buscaPlaca.replace(/[^a-z0-9]/g, "");
-
-    // Se a busca for "sem placa", o matchPlaca será verdadeiro para campos null
-    const matchPlaca =
-      !buscaPlaca ||
-      placaEfetiva.includes(buscaPlaca) ||
-      placaLimpa.includes(buscaLimpa);
-
-    // --- Outros filtros (Cliente, Produto, Status, Data) ---
-    const matchCliente =
-      !filtros.value.cliente ||
-      row.client?.nome
-        ?.toLowerCase()
-        .includes(filtros.value.cliente.toLowerCase());
-
-    const matchProduto =
-      !filtros.value.produto || row.produto?.nome === filtros.value.produto;
-
-    const matchStatus =
-      !filtros.value.status || row.status === filtros.value.status;
-
-    let matchData = true;
-    if (filtros.value.periodo) {
-      const dataDoc = new Date(row.createdAt).setHours(0, 0, 0, 0);
-      if (typeof filtros.value.periodo === "string") {
-        matchData = dataDoc === parseDate(filtros.value.periodo).getTime();
-      } else {
-        matchData =
-          dataDoc >= parseDate(filtros.value.periodo.from).getTime() &&
-          dataDoc <= parseDate(filtros.value.periodo.to).getTime();
-      }
-    }
-
-    return (
-      matchCliente && matchPlaca && matchProduto && matchStatus && matchData
-    );
-  });
+  return f === t ? formatar(f) : `${formatar(f)} - ${formatar(t)}`;
 });
 
 const limparFiltros = () => {
   filtros.value = {
-    busca: "",
+    cliente: "",
+    placa: "",
+    metragem: null,
+    produto: null,
     status: null,
-    produto: "",
     periodo: null,
-    dataStr: "",
   };
+  router.push(route.path);
 };
 
-// Auxiliar para converter string DD/MM/YYYY para Date
-function parseDate(dateStr) {
-  const [d, m, y] = dateStr.split("/");
-  return new Date(y, m - 1, d);
-}
+// O motor que sincroniza e busca
+watch(
+  () => route.query,
+  (novaQuery) => {
+    console.log("A URL mudou! Novos parâmetros:", novaQuery);
+    sincronizarFiltrosPelaUrl();
+    carregarDados();
+  },
+  { deep: true, immediate: true }
+);
+
+// Monitora os inputs. Quando você digita, ele atualiza a URL.
+
+const atualizarUrlComDebounce = debounce(() => {
+      const queryParams = {
+      searchCliente: filtros.value.cliente || undefined,
+      searchPlaca: filtros.value.placa || undefined,
+      searchProduto: filtros.value.produto || undefined,
+      searchStatus: filtros.value.status || undefined,
+      searchMetragem: filtros.value.metragem || undefined,
+    };
+
+    if (filtros.value.periodo) {
+      const f = filtros.value.periodo.from || filtros.value.periodo;
+      const t = filtros.value.periodo.to || filtros.value.periodo;
+      queryParams.from = f.replaceAll("/", "-");
+      queryParams.to = t.replaceAll("/", "-");
+    } else {
+      delete queryParams.from;
+      delete queryParams.to;
+    }
+
+    // Atualiza a URL sem criar 1000 itens no histórico do navegador (replace: true)
+    router.push({ query: queryParams, replace: true });
+}, 500);
+
+watch(
+  () => filtros.value,
+  () => {
+    atualizarUrlComDebounce();
+  },
+  { deep: true } // Importante para detectar mudanças dentro do objeto
+);
 
 const resumoGeral = computed(() => {
   // Inicializamos o acumulador
@@ -1480,7 +1520,7 @@ const resumoGeral = computed(() => {
   };
 
   // Percorre a lista que já está filtrada pela sua busca
-  return rowsFiltrados.value.reduce((acc, row) => {
+  return rowsPedidos.value.reduce((acc, row) => {
     const valor = Number(row.valor_total || 0);
     const metragem = Number(row.metragem || 0);
     const nomeProduto = row.produto?.nome?.toLowerCase() || "";
@@ -1545,7 +1585,11 @@ watch(
   },
 );
 
-onMounted(carregarDados(), carregarDadosIniciais());
+onMounted(async () => {
+  (sincronizarFiltrosPelaUrl(),
+    await carregarDados(),
+    await carregarDadosIniciais());
+});
 </script>
 
 <style scoped>
