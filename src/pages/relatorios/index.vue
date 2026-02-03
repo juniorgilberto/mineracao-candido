@@ -593,6 +593,7 @@
                   filled
                   map-options
                   emit-value
+                  @update:model-value="onVeiculoChange"
                 >
                   <template v-slot:prepend>
                     <q-icon name="local_shipping" color="blue" />
@@ -1132,9 +1133,6 @@ async function carregarDados() {
       to: route.query.to || undefined,
     };
 
-    console.log(params);
-
-
     const [resPedidos, resFechamentos] = await Promise.all([
       api.get("/pedidos", { params }),
       api.get("/fechamentos"),
@@ -1466,7 +1464,6 @@ const limparFiltros = () => {
 watch(
   () => route.query,
   (novaQuery) => {
-    console.log("A URL mudou! Novos parâmetros:", novaQuery);
     sincronizarFiltrosPelaUrl();
     carregarDados();
   },
@@ -1551,6 +1548,18 @@ const veiculosDoCliente = computed(() => {
   );
 });
 
+const onVeiculoChange = (novoVeiculoId) => {
+  if (!novoVeiculoId) return;
+
+  // Busca o veículo na lista para pegar a capacidade/metragem dele
+  const veiculo = veiculosDoCliente.value.find((v) => v.id === novoVeiculoId);
+
+  if (veiculo) {
+    // Aqui ele só vai substituir a metragem se o usuário mudar o veículo
+    pedidoEdicao.value.metragem = veiculo.metragem;
+  }
+};
+
 watch(
   () => pedidoEdicao.value.produtoId,
   (novoId) => {
@@ -1562,18 +1571,6 @@ watch(
   },
 );
 
-watch(
-  () => pedidoEdicao.value.veiculoId,
-  (novoVeiculoId) => {
-    // Procuramos o veículo dentro da lista filtrada
-    const veiculo = veiculosDoCliente.value.find((v) => v.id === novoVeiculoId);
-
-    if (veiculo) {
-      // A metragem do pedido passa a ser a metragem/capacidade do veículo selecionado
-      pedidoEdicao.value.metragem = veiculo.metragem;
-    }
-  },
-);
 
 watch(
   [() => pedidoEdicao.value.metragem, () => pedidoEdicao.value.produto_valor],

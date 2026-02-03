@@ -51,6 +51,7 @@
       v-model="cardVenda"
       transition-show="scale"
       transition-hide="scale"
+      @hide="resetarCampos"
     >
       <q-card
         class="my-card"
@@ -567,7 +568,6 @@ async function confirmarViagem() {
   try {
     const { clientId, detalhes } = pedidoSelecionado.value;
     const { produtoId, veiculoId, metragem, produtoValor } = detalhes;
-    console.log(produtoValor);
 
     await api.post("/pedidos", {
       clientId,
@@ -699,6 +699,8 @@ const salvarVenda = async () => {
       type: "positive",
       message: "Venda cadastrada com sucesso!",
     });
+
+    resetarCampos();
     cardVenda.value = false;
     carregarPedidos();
   } catch (error) {
@@ -710,6 +712,19 @@ const salvarVenda = async () => {
   } finally {
     carregandoNovaVenda.value = false;
     formVendas.value.reset();
+  }
+};
+
+const resetarCampos = () => {
+  clientId.value = null;
+  veiculoId.value = null;
+  produtoId.value = null;
+  metrosCubicos.value = 0;
+  valorProduto.value = 0;
+
+  // Limpa o estado visual de erro do Quasar
+  if (formVendas.value) {
+    formVendas.value.resetValidation();
   }
 };
 
