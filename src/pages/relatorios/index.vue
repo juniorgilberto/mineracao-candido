@@ -173,32 +173,63 @@
                 </div>
               </q-card-section>
               <q-card-section class="q-py-none q-my-md">
-                <div class="row q-col-gutter-sm justify-between">
-                  <div class="col-12 col-md-3">
+                <div class="row q-col-gutter-md justify-between">
+                  <div class="col-12 col-md-4">
                     <q-card
                       flat
                       bordered
                       class="shadow-1 full-height"
                       style="
-                        border-radius: 8px;
-                        border-left: 4px solid var(--q-positive);
+                        border-radius: 12px;
+                        border-left: 6px solid var(--q-positive);
                       "
                     >
-                      <q-card-section class="q-pa-sm row items-center no-wrap">
-                        <q-icon
-                          name="payments"
-                          size="sm"
-                          class="q-mr-sm opacity-70 text-positive"
-                        />
-                        <div>
+                      <q-card-section class="q-pa-md">
+                        <div class="row items-center q-mb-xs">
+                          <q-icon
+                            name="payments"
+                            size="sm"
+                            class="text-positive q-mr-sm"
+                            style="opacity: 0.8"
+                          />
                           <div
-                            class="text-overline"
-                            style="line-height: 1; font-size: 0.6rem"
+                            class="text-overline text-grey-7"
+                            style="line-height: 1; letter-spacing: 1px"
                           >
                             VALOR TOTAL
                           </div>
-                          <div class="text-h6 text-weight-bolder text-positive">
-                            {{ formatCurrency(resumoGeral.valorTotal) }}
+                        </div>
+                        <div
+                          class="text-h5 text-weight-bolder text-positive q-mb-sm"
+                        >
+                          {{ formatCurrency(resumoGeral.valorTotal) }}
+                        </div>
+                        <q-separator q-my-sm o-05 />
+                        <div class="row items-center justify-between no-wrap">
+                          <div class="column">
+                            <span class="text-caption text-grey-7"
+                              >Viagens</span
+                            >
+                            <span class="text-weight-bold">{{
+                              resumoGeral.qtdCascalho + resumoGeral.qtdTerra
+                            }}</span>
+                          </div>
+                          <q-separator vertical inset class="q-mx-sm" />
+                          <div class="column items-end">
+                            <span class="text-caption text-grey-7"
+                              >Volume Total</span
+                            >
+                            <span
+                              class="text-weight-bolder text-subtitle1 text-primary"
+                            >
+                              {{
+                                (
+                                  resumoGeral.metragemCascalho +
+                                  resumoGeral.metragemTerra
+                                ).toFixed(2)
+                              }}
+                              m³
+                            </span>
                           </div>
                         </div>
                       </q-card-section>
@@ -210,46 +241,50 @@
                       flat
                       bordered
                       class="shadow-1 full-height"
-                      style="border-radius: 8px; border-left: 4px solid #5d4037"
+                      style="
+                        border-radius: 12px;
+                        border-left: 6px solid #1976d2;
+                      "
                     >
-                      <q-card-section
-                        class="q-pa-sm row items-center justify-between no-wrap"
-                      >
-                        <div class="row items-center">
+                      <q-card-section class="q-pa-md">
+                        <div class="row items-center q-mb-xs">
                           <q-icon
-                            name="layers"
-                            color="brown-10"
-                            size="xs"
-                            class="q-mr-xs"
+                            name="landscape"
+                            size="sm"
+                            color="blue-7"
+                            class="q-mr-sm"
+                            style="opacity: 0.8"
                           />
-                          <div class="text-weight-bold text-brown-10">
-                            Cascalho
-                          </div>
-                        </div>
-                        <div class="text-right">
-                          <span class="text-caption text-grey-7"
-                            >Viagens:
-                          </span>
-                          <span class="text-weight-bold">{{
-                            resumoGeral.qtdCascalho
-                          }}</span>
-                          <q-separator vertical inset spaced class="inline" />
-                          <span class="text-weight-bolder text-subtitle2"
-                            >{{
-                              resumoGeral.metragemCascalho.toFixed(2)
-                            }}
-                            m³</span
-                          >
-                        </div>
-                        <div class="text-right q-pl-md">
                           <div
-                            class="text-caption text-grey-6"
-                            style="font-size: 0.7rem"
+                            class="text-overline text-grey-7"
+                            style="line-height: 1; letter-spacing: 1px"
                           >
-                            Subtotal
+                            CASCALHO
                           </div>
-                          <div class="text-weight-bold text-brown">
-                            {{ formatCurrency(resumoGeral.valorCascalho) }}
+                        </div>
+                        <div
+                          class="text-h5 text-weight-bolder text-blue-7 q-mb-sm"
+                        >
+                          {{ formatCurrency(resumoGeral.valorCascalho) }}
+                        </div>
+                        <q-separator q-my-sm o-05 />
+                        <div class="row items-center justify-between no-wrap">
+                          <div class="column">
+                            <span class="text-caption text-grey-7"
+                              >Viagens</span
+                            >
+                            <span class="text-weight-bold">{{
+                              resumoGeral.qtdCascalho
+                            }}</span>
+                          </div>
+                          <q-separator vertical inset class="q-mx-sm" />
+                          <div class="column items-end">
+                            <span class="text-caption text-grey-7">Volume</span>
+                            <span
+                              class="text-weight-bolder text-subtitle1 text-blue-7"
+                            >
+                              {{ resumoGeral.metragemCascalho.toFixed(2) }} m³
+                            </span>
                           </div>
                         </div>
                       </q-card-section>
@@ -261,43 +296,50 @@
                       flat
                       bordered
                       class="shadow-1 full-height"
-                      style="border-radius: 8px; border-left: 4px solid #388e3c"
+                      style="
+                        border-radius: 12px;
+                        border-left: 6px solid var(--q-secondary);
+                      "
                     >
-                      <q-card-section
-                        class="q-pa-sm row items-center justify-between no-wrap"
-                      >
-                        <div class="row items-center">
+                      <q-card-section class="q-pa-md">
+                        <div class="row items-center q-mb-xs">
                           <q-icon
-                            name="eco"
-                            color="green-10"
-                            size="xs"
-                            class="q-mr-xs"
+                            name="landslide"
+                            size="sm"
+                            color="secondary"
+                            class="q-mr-sm"
+                            style="opacity: 0.8"
                           />
-                          <div class="text-weight-bold text-green-10">
-                            Terra
-                          </div>
-                        </div>
-                        <div class="text-right">
-                          <span class="text-caption text-grey-7"
-                            >Viagens:
-                          </span>
-                          <span class="text-weight-bold">{{
-                            resumoGeral.qtdTerra
-                          }}</span>
-                          <q-separator vertical inset spaced class="inline" />
-                          <span class="text-weight-bolder text-subtitle2"
-                            >{{ resumoGeral.metragemTerra.toFixed(2) }} m³</span
-                          >
-                        </div>
-                        <div class="text-right q-pl-md">
                           <div
-                            class="text-caption text-grey-6"
-                            style="font-size: 0.7rem"
+                            class="text-overline text-grey-7"
+                            style="line-height: 1; letter-spacing: 1px"
                           >
-                            Subtotal
+                            TERRA
                           </div>
-                          <div class="text-weight-bold text-green-9">
-                            {{ formatCurrency(resumoGeral.valorTerra) }}
+                        </div>
+                        <div
+                          class="text-h5 text-weight-bolder text-secondary q-mb-sm"
+                        >
+                          {{ formatCurrency(resumoGeral.valorTerra) }}
+                        </div>
+                        <q-separator q-my-sm o-05 />
+                        <div class="row items-center justify-between no-wrap">
+                          <div class="column">
+                            <span class="text-caption text-grey-7"
+                              >Viagens</span
+                            >
+                            <span class="text-weight-bold">{{
+                              resumoGeral.qtdTerra
+                            }}</span>
+                          </div>
+                          <q-separator vertical inset class="q-mx-sm" />
+                          <div class="column items-end">
+                            <span class="text-caption text-grey-7">Volume</span>
+                            <span
+                              class="text-weight-bolder text-subtitle1 text-secondary"
+                            >
+                              {{ resumoGeral.metragemTerra.toFixed(2) }} m³
+                            </span>
                           </div>
                         </div>
                       </q-card-section>
@@ -602,9 +644,6 @@
                     <q-item v-bind="scope.itemProps">
                       <q-item-section>
                         <q-item-label>{{ scope.opt.placa }}</q-item-label>
-                        <q-item-label caption>{{
-                          scope.opt.modelo
-                        }}</q-item-label>
                       </q-item-section>
                     </q-item>
                   </template>
@@ -623,6 +662,7 @@
                   bg-color="blue-1"
                   stack-label
                   icon="inventory_2"
+                  @update:model-value="onProdutoChange"
                 >
                   <template v-slot:prepend>
                     <q-icon name="shopping_cart" color="blue" />
@@ -1147,14 +1187,11 @@ async function carregarDados() {
   }
 }
 
-
 const pagination = ref({
   sortBy: "data", // Nome da coluna definida em 'name'
   descending: true, // 'true' para o mais recente primeiro
   rowsPerPage: 20,
 });
-
-
 
 const carregarDadosIniciais = async () => {
   try {
@@ -1178,7 +1215,6 @@ const abrirEdicao = (item) => {
 
 const salvarAlteracoesPedido = async () => {
   loading.value = true;
-  console.log("Dados prontos para API:", pedidoEdicao.value);
   try {
     await api.put(`/pedidos/${pedidoEdicao.value.id}`, pedidoEdicao.value);
     $q.notify({ color: "positive", message: "Pedido atualizado com sucesso!" });
@@ -1441,7 +1477,7 @@ const dataStr = computed(() => {
   const t = filtros.value.periodo.to || filtros.value.periodo;
 
   const formatar = (d) => {
-    if (typeof d !== 'string') return "";
+    if (typeof d !== "string") return "";
     return d.split("/").reverse().join("/"); // Transforma 2026/02/01 em 01/02/2026
   };
 
@@ -1467,32 +1503,32 @@ watch(
     sincronizarFiltrosPelaUrl();
     carregarDados();
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 );
 
 // Monitora os inputs. Quando você digita, ele atualiza a URL.
 
 const atualizarUrlComDebounce = debounce(() => {
-      const queryParams = {
-      searchCliente: filtros.value.cliente || undefined,
-      searchPlaca: filtros.value.placa || undefined,
-      searchProduto: filtros.value.produto || undefined,
-      searchStatus: filtros.value.status || undefined,
-      searchMetragem: filtros.value.metragem || undefined,
-    };
+  const queryParams = {
+    searchCliente: filtros.value.cliente || undefined,
+    searchPlaca: filtros.value.placa || undefined,
+    searchProduto: filtros.value.produto || undefined,
+    searchStatus: filtros.value.status || undefined,
+    searchMetragem: filtros.value.metragem || undefined,
+  };
 
-    if (filtros.value.periodo) {
-      const f = filtros.value.periodo.from || filtros.value.periodo;
-      const t = filtros.value.periodo.to || filtros.value.periodo;
-      queryParams.from = f.replaceAll("/", "-");
-      queryParams.to = t.replaceAll("/", "-");
-    } else {
-      delete queryParams.from;
-      delete queryParams.to;
-    }
+  if (filtros.value.periodo) {
+    const f = filtros.value.periodo.from || filtros.value.periodo;
+    const t = filtros.value.periodo.to || filtros.value.periodo;
+    queryParams.from = f.replaceAll("/", "-");
+    queryParams.to = t.replaceAll("/", "-");
+  } else {
+    delete queryParams.from;
+    delete queryParams.to;
+  }
 
-    // Atualiza a URL sem criar 1000 itens no histórico do navegador (replace: true)
-    router.push({ query: queryParams, replace: true });
+  // Atualiza a URL sem criar 1000 itens no histórico do navegador (replace: true)
+  router.push({ query: queryParams, replace: true });
 }, 500);
 
 watch(
@@ -1500,7 +1536,7 @@ watch(
   () => {
     atualizarUrlComDebounce();
   },
-  { deep: true } // Importante para detectar mudanças dentro do objeto
+  { deep: true }, // Importante para detectar mudanças dentro do objeto
 );
 
 const resumoGeral = computed(() => {
@@ -1560,17 +1596,15 @@ const onVeiculoChange = (novoVeiculoId) => {
   }
 };
 
-watch(
-  () => pedidoEdicao.value.produtoId,
-  (novoId) => {
-    const produto = listaProdutos.value.find((p) => p.id === novoId);
-    if (produto) {
-      const valorBase = parseFloat(produto.valor_m3) || 0;
-      pedidoEdicao.value.produto_valor = valorBase.toFixed(2);
-    }
-  },
-);
+const onProdutoChange = (novoProdutoId) => {
+  if (!novoProdutoId) return;
 
+  const produto = listaProdutos.value.find((p) => p.id === novoProdutoId);
+
+  if (produto) {
+    pedidoEdicao.value.produto_valor = produto.valor_m3;
+  }
+};
 
 watch(
   [() => pedidoEdicao.value.metragem, () => pedidoEdicao.value.produto_valor],
